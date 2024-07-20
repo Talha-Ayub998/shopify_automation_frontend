@@ -74,6 +74,7 @@ export default function SignUp() {
             console.log('Sign up successful:', response.data);
             localStorage.setItem('userId', response.data.user.id);
             localStorage.setItem('sessionId', response.data.session_id);
+            localStorage.setItem('userEmail', response.data.user.email);
 
             // Assuming the sign-up response includes a token
             const { token } = response.data;

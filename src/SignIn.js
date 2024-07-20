@@ -89,6 +89,7 @@ export default function SignIn() {
             // Store token in local storage
             localStorage.setItem('userId', response.data.user.id);
             localStorage.setItem('sessionId', response.data.session_id);
+            localStorage.setItem('userEmail', response.data.user.email);
 
             login(token); // Set authentication state
             // Redirect to the chat page

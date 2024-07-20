@@ -16,7 +16,8 @@ const ChatPage = () => {
   const { logout, loginSuccess, setLoginSuccess } = useAuth();
   const authToken = localStorage.getItem('authToken');
   const userId = localStorage.getItem('userId');
-  let sessionId = localStorage.getItem('sessionId');
+  const sessionId = localStorage.getItem('sessionId');
+  const userEmail = localStorage.getItem('userEmail');
 
   const handleLogout = () => {
     logout();
@@ -83,7 +84,6 @@ const ChatPage = () => {
           text: msg.message,
           isSender: msg.is_sender,
         }));
-        console.log("fetchedMessages", fetchedMessages);
         setMessages(fetchedMessages);
       } catch (error) {
         console.error('Error fetching chat history:', error);
@@ -151,6 +151,7 @@ const ChatPage = () => {
       <ChatPageContainer>
         <Header>
           <HeaderContent>
+            <UserEmail>{userEmail}</UserEmail> {/* Add this line */}
             <Title>Chat with Bot</Title>
             <LogoutButton onClick={handleLogout}>Logout</LogoutButton>
           </HeaderContent>
@@ -185,11 +186,9 @@ const ChatPage = () => {
 export default ChatPage;
 
 
-
 const Title = styled.div`
   font-size: 24px;
-  flex: 1;
-  text-align: center;
+  margin: 0 0px 0 -55px /* Add some margin to create space between elements */
 `;
 
 const LogoutButton = styled.button`
@@ -309,7 +308,18 @@ const HeaderContent = styled.div`
   display: flex;
   align-items: center;
   width: 100%;
-  justify-content: space-between;
+  justify-content: space-between; /* This will distribute the elements evenly */
+  padding: 0 20px; /* Add some padding to create space between elements */
+`;
+
+const UserEmail = styled.div`
+  font-size: 15px;
+  color: #ffffff; /* White text */
+  background-color: #444654; /* Blue background */
+  padding: 5px 10px; /* Add some padding to create a box-like effect */
+  border-radius: 5px; /* Add a slight rounded corner effect */
+  display: inline-block; /* Make it an inline-block element */
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.2); /* Add a subtle shadow effect */
 `;
 
 const Body = styled.div`
