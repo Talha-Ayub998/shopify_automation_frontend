@@ -1,27 +1,37 @@
 import React, { useState, useRef, useEffect } from 'react';
 import axios from 'axios';
 import styled from 'styled-components';
-import { useNavigate } from 'react-router-dom';
 import { useAuth } from './AuthContext'; // Make sure this path is correct
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import api from './api';
+import { Oval } from 'react-loader-spinner';
 
+const LoadingContainer = styled.div`
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    width: 100vw;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background-color: rgba(255, 255, 255, 0.8);
+    z-index: 9999;
+`;
 
 const ChatPage = () => {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const bodyRef = useRef(null);
-  const navigate = useNavigate();
   const { logout, loginSuccess, setLoginSuccess } = useAuth();
-  const authToken = localStorage.getItem('authToken');
   const userId = localStorage.getItem('userId');
   const sessionId = localStorage.getItem('sessionId');
   const userEmail = localStorage.getItem('userEmail');
+  const [loading, setLoading] = useState(false);
 
   const handleLogout = () => {
     logout();
-    navigate('/signin');
   };
 
   useEffect(() => {
@@ -35,7 +45,9 @@ const ChatPage = () => {
         draggable: true,
         progress: undefined,
       });
+      setLoading(true); // Set loading state to true
       setLoginSuccess(false); // Reset login success flag
+      setTimeout(() => setLoading(false), 2000); // Hide loading spinner after 2 seconds
     }
   }, [loginSuccess, setLoginSuccess]);
 
@@ -148,6 +160,20 @@ const ChatPage = () => {
 
   return (
     <PageWrapper>
+      {loading && (
+        <LoadingContainer>
+          <Oval
+            height={100}
+            width={100}
+            color="#4fa94d"
+            visible={true}
+            ariaLabel='oval-loading'
+            secondaryColor="#4fa94d"
+            strokeWidth={2}
+            strokeWidthSecondary={2}
+          />
+        </LoadingContainer>
+      )}
       <ChatPageContainer>
         <Header>
           <HeaderContent>

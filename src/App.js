@@ -5,6 +5,7 @@ import SignUp from './SignUp';
 import ChatPage from './ChatPage';
 import ProtectedRoute from './ProtectedRoute';
 import { AuthProvider } from './AuthContext';
+import TwoFactorAuth from './TwoFactorAuth';
 
 const App = () => {
   return (
@@ -13,6 +14,7 @@ const App = () => {
         <Routes>
           <Route path="/signin" element={<SignIn />} />
           <Route path="/signup" element={<SignUp />} />
+          <Route path="/2fa" element={<TwoFactorAuth />} />
           <Route path="/" element={<SignIn />} /> {/* Default to SignIn */}
           <Route path="/chatpage" element={<ProtectedRoute element={<ChatPage />} />} />
         </Routes>

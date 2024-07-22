@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -13,29 +13,36 @@ import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from './AuthContext';
 import api from './api';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { Oval } from 'react-loader-spinner';
+import styled from 'styled-components';
 
 const theme = createTheme();
 
-function Copyright(props) {
-    return (
-        <Typography variant="body2" color="text.secondary" align="center" {...props}>
-            {'Copyright © '}
-            <Link color="inherit" href="https://mui.com/">
-                Your Website
-            </Link>{' '}
-            {new Date().getFullYear()}
-            {'.'}
-        </Typography>
-    );
-}
-
 export default function SignUp() {
+    const [mfaEnabled, setMfaEnabled] = useState(false);
+    const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
-    const { login } = useAuth();
+
+    useEffect(() => {
+        if (mfaEnabled) {
+            setLoading(true);
+            // Delay the navigation to allow the loader to be visible
+            setTimeout(() => {
+                navigate('/2fa');
+            }, 2000); // Adjust the delay as needed
+        }
+    }, [mfaEnabled, navigate]);
+
+    const handleNavigate = (event) => {
+        event.preventDefault();
+        setLoading(true);
+        setTimeout(() => {
+            navigate('/signin');
+        }, 1000);
+    };
 
     const handleSubmit = async (event) => {
         event.preventDefault();
@@ -72,19 +79,21 @@ export default function SignUp() {
             });
             // console.log('Sign up successful:', response.data);
             console.log('Sign up successful:', response.data);
-            localStorage.setItem('userId', response.data.user.id);
-            localStorage.setItem('sessionId', response.data.session_id);
-            localStorage.setItem('userEmail', response.data.user.email);
+            localStorage.setItem('userId', response.data.user_id);
+            localStorage.setItem('userEmail', response.data.user_email);
+            setMfaEnabled(true);
+            // localStorage.setItem('sessionId', response.data.session_id);
+            // localStorage.setItem('userEmail', response.data.user.email);
 
             // Assuming the sign-up response includes a token
-            const { token } = response.data;
-            if (token) {
-                login(token); // Update authentication state
-                navigate('/chatpage'); // Redirect to chat page
-            } else {
-                // If no token is returned, redirect to login page
-                navigate('/signin');
-            }
+            // const { token } = response.data;
+            // if (token) {
+            //     login(token); // Update authentication state
+            //     navigate('/chatpage'); // Redirect to chat page
+            // } else {
+            //     // If no token is returned, redirect to login page
+            //     navigate('/signin');
+            // }
         } catch (error) {
             console.error('Sign up error:', error.response?.data);
 
@@ -117,106 +126,158 @@ export default function SignUp() {
     };
 
     return (
-        <ThemeProvider theme={theme}>
-            <Container component="main" maxWidth="xs">
-                <CssBaseline />
-                <Box
-                    sx={{
-                        marginTop: 8,
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                    }}
-                >
-                    <Avatar sx={{ m: 1, bgcolor: theme.palette.secondary.main }}>
-                        <LockOutlinedIcon />
-                    </Avatar>
-                    <Typography component="h1" variant="h5">
-                        Sign up
-                    </Typography>
-                    <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 3 }}>
-                        <Grid container spacing={2}>
-                            <Grid item xs={12}>
-                                <TextField
-                                    autoComplete="given-name"
-                                    name="username"
-                                    required
-                                    fullWidth
-                                    id="username"
-                                    label="Username"
-                                    autoFocus
-                                />
-                            </Grid>
-                            <Grid item xs={12}>
-                                <TextField
-                                    required
-                                    fullWidth
-                                    id="email"
-                                    label="Email Address"
-                                    name="email"
-                                    autoComplete="email"
-                                />
-                            </Grid>
-                            <Grid item xs={12}>
-                                <TextField
-                                    required
-                                    fullWidth
-                                    name="password"
-                                    label="Password"
-                                    type="password"
-                                    id="password"
-                                    autoComplete="new-password"
-                                />
-                            </Grid>
-                            <Grid item xs={12} sm={6}>
-                                <TextField
-                                    required
-                                    fullWidth
-                                    id="shopifyUrl"
-                                    label="Shopify Url"
-                                    name="shopifyUrl"
-                                    autoComplete="shopifyUrl"
-                                />
-                            </Grid>
-                            <Grid item xs={12} sm={6}>
-                                <TextField
-                                    required
-                                    fullWidth
-                                    id="accessToken"
-                                    label="Access Token"
-                                    name="accessToken"
-                                    autoComplete="accessToken"
-                                />
-                            </Grid>
-                            <Grid item xs={12}>
-                                <FormControlLabel
-                                    control={<Checkbox value="allowExtraEmails" color="primary" />}
-                                    label="I want to receive inspiration, marketing promotions and updates via email."
-                                    name="allowExtraEmails"
-                                />
-                            </Grid>
-                        </Grid>
-                        <Button
-                            type="submit"
-                            fullWidth
-                            variant="contained"
-                            color="primary"
-                            sx={{ mt: 3, mb: 2 }}
+        <>
+            {loading ? (
+                <LoadingContainer>
+                    <Oval
+                        height={100}
+                        width={100}
+                        color="#4fa94d"
+                        wrapperStyle={{}}
+                        wrapperClass=""
+                        visible={true}
+                        ariaLabel='oval-loading'
+                        secondaryColor="#4fa94d"
+                        strokeWidth={2}
+                        strokeWidthSecondary={2}
+                    />
+                </LoadingContainer>
+            ) : (
+                <ThemeProvider theme={theme}>
+                    <Container component="main" maxWidth="xs">
+                        <CssBaseline />
+                        <Box
+                            sx={{
+                                marginTop: 8,
+                                display: 'flex',
+                                flexDirection: 'column',
+                                alignItems: 'center',
+                            }}
                         >
-                            Sign Up
-                        </Button>
-                        <Grid container justifyContent="flex-end">
-                            <Grid item>
-                                <Link href="/signin" variant="body2">
-                                    Already have an account? Sign in
-                                </Link>
-                            </Grid>
-                        </Grid>
-                    </Box>
-                </Box>
-                <Copyright sx={{ mt: 8, mb: 4 }} />
-            </Container>
-            <ToastContainer />
-        </ThemeProvider>
+                            <Avatar sx={{ m: 1, bgcolor: theme.palette.secondary.main }}>
+                                <LockOutlinedIcon />
+                            </Avatar>
+                            <Typography component="h1" variant="h5">
+                                Sign up
+                            </Typography>
+                            <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 3 }}>
+                                <Grid container spacing={2}>
+                                    <Grid item xs={12}>
+                                        <TextField
+                                            autoComplete="given-name"
+                                            name="username"
+                                            required
+                                            fullWidth
+                                            id="username"
+                                            label="Username"
+                                            autoFocus
+                                        />
+                                    </Grid>
+                                    <Grid item xs={12}>
+                                        <TextField
+                                            required
+                                            fullWidth
+                                            id="email"
+                                            label="Email Address"
+                                            name="email"
+                                            autoComplete="email"
+                                        />
+                                    </Grid>
+                                    <Grid item xs={12}>
+                                        <TextField
+                                            required
+                                            fullWidth
+                                            name="password"
+                                            label="Password"
+                                            type="password"
+                                            id="password"
+                                            autoComplete="new-password"
+                                        />
+                                    </Grid>
+                                    <Grid item xs={12} sm={6}>
+                                        <TextField
+                                            required
+                                            fullWidth
+                                            id="shopifyUrl"
+                                            label="Shopify Url"
+                                            name="shopifyUrl"
+                                            autoComplete="shopifyUrl"
+                                        />
+                                    </Grid>
+                                    <Grid item xs={12} sm={6}>
+                                        <TextField
+                                            required
+                                            fullWidth
+                                            id="accessToken"
+                                            label="Access Token"
+                                            name="accessToken"
+                                            autoComplete="accessToken"
+                                        />
+                                    </Grid>
+                                    <Grid item xs={12}>
+                                        <FormControlLabel
+                                            control={<Checkbox value="allowExtraEmails" color="primary" />}
+                                            label="I want to receive inspiration, marketing promotions and updates via email."
+                                            name="allowExtraEmails"
+                                        />
+                                    </Grid>
+                                </Grid>
+                                <Button
+                                    type="submit"
+                                    fullWidth
+                                    variant="contained"
+                                    color="primary"
+                                    sx={{ mt: 3, mb: 2 }}
+                                >
+                                    Sign Up
+                                </Button>
+                                <Grid container justifyContent="flex-end">
+                                    <Grid item>
+                                        <Link
+                                            onClick={handleNavigate}
+                                            variant="body2"
+                                            sx={{
+                                                cursor: 'pointer' // Ensure the cursor is a pointer
+                                            }}
+                                        >
+                                            {"Don't have an account? Sign Up"}
+                                        </Link>
+                                    </Grid>
+                                </Grid>
+                            </Box>
+                        </Box>
+                        <Copyright sx={{ mt: 8, mb: 4 }} />
+                    </Container>
+                    <ToastContainer />
+                </ThemeProvider>
+            )}
+        </>
     );
 }
+
+
+function Copyright(props) {
+    return (
+        <Typography variant="body2" color="text.secondary" align="center" {...props}>
+            {'Copyright © '}
+            <Link color="inherit" href="#">
+                Your Website
+            </Link>{' '}
+            {new Date().getFullYear()}
+            {'.'}
+        </Typography>
+    );
+}
+
+const LoadingContainer = styled.div`
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    width: 100vw;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background-color: rgba(255, 255, 255, 0.8);
+    z-index: 9999;
+`;
