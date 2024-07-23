@@ -18,6 +18,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Oval } from 'react-loader-spinner';
 import styled from 'styled-components';
+import { useAuth } from './AuthContext';
 
 const theme = createTheme();
 
@@ -25,12 +26,12 @@ export default function SignUp() {
     const [mfaEnabled, setMfaEnabled] = useState(false);
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
+    const { setIsSignupComplete } = useAuth();
 
     useEffect(() => {
         if (mfaEnabled) {
             setLoading(true);
             navigate('/2fa');
-            // Delay the navigation to allow the loader to be visible
         }
     }, [mfaEnabled, navigate]);
 
@@ -73,6 +74,7 @@ export default function SignUp() {
             });
             // console.log('Sign up successful:', response.data);
             setMfaEnabled(true);
+            setIsSignupComplete(true);
             console.log('Sign up successful:', response.data);
             localStorage.setItem('userId', response.data.user_id);
             localStorage.setItem('userEmail', response.data.user_email);

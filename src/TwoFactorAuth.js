@@ -9,10 +9,19 @@ const TwoFactorAuth = () => {
     const [otp, setOtp] = useState(new Array(6).fill(""));
     const [error, setError] = useState(null);
     const navigate = useNavigate();
-    const { login } = useAuth();
+    const { login, isSignupComplete } = useAuth();
     const user_id = localStorage.getItem('userId');
     const email = localStorage.getItem('userEmail');
     const [message, setMessage] = useState('');
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        if (!isSignupComplete) {
+            navigate('/signup'); // Redirect to signup if 2FA is accessed directly
+        } else {
+            setLoading(false); // Continue rendering if signup is complete
+        }
+    }, [isSignupComplete, navigate]);
 
     const handleChange = (element, index) => {
         if (isNaN(element.value)) return false;
@@ -70,6 +79,10 @@ const TwoFactorAuth = () => {
 
     };
 
+    if (loading) {
+        return; // Optional: Show a loading spinner or placeholder
+    }
+
     return (
         <div style={styles.container}>
             <div style={styles.mailIcon}>📧</div>
@@ -113,7 +126,7 @@ const styles = {
         backgroundColor: 'white',
         padding: '40px',
         borderRadius: '10px',
-        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+        boxShadow: '0px 0px 5px rgba(0, 0, 0, 0.1)', // Reduce the blur effect
         maxWidth: '400px',
         margin: '0 auto',
         marginTop: '100px',
