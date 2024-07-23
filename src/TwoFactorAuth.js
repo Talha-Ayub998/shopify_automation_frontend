@@ -166,7 +166,7 @@ const styles = {
         padding: '10px',
         margin: '10px 0',
         fontSize: '16px',
-        backgroundColor: 'black',
+        backgroundColor: '#1976D2',
         color: 'white',
         border: 'none',
         borderRadius: '5px',
