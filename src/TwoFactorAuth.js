@@ -59,7 +59,7 @@ const TwoFactorAuth = () => {
             login(token); // Set authentication state
             navigate('/chatpage');
         } catch (error) {
-            let errorMessage = 'Invalid OTP or OTP is expired.';
+            let errorMessage = 'Invalid OTP Or OTP is expired. Please Resend';
             setError(errorMessage);
         }
     };

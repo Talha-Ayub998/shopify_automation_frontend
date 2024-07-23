@@ -7,19 +7,6 @@ import 'react-toastify/dist/ReactToastify.css';
 import api from './api';
 import { Oval } from 'react-loader-spinner';
 
-const LoadingContainer = styled.div`
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    width: 100vw;
-    position: fixed;
-    top: 0;
-    left: 0;
-    background-color: rgba(255, 255, 255, 0.8);
-    z-index: 9999;
-`;
-
 const ChatPage = () => {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
@@ -38,17 +25,15 @@ const ChatPage = () => {
     if (loginSuccess) {
       toast.success('Login successful!', {
         position: 'top-right',
-        autoClose: 5000,
+        autoClose: 2000,
         hideProgressBar: false,
         closeOnClick: true,
         pauseOnHover: true,
         draggable: true,
         progress: undefined,
       });
-      setLoading(true); // Set loading state to true
-      setLoginSuccess(false); // Reset login success flag
-      setTimeout(() => setLoading(false), 2000); // Hide loading spinner after 2 seconds
     }
+    setLoginSuccess(false); // Reset login success flag
   }, [loginSuccess, setLoginSuccess]);
 
   // Load messages from localStorage when the component mounts
@@ -73,23 +58,9 @@ const ChatPage = () => {
     };
   }, []);
 
-  // Save messages to localStorage whenever they change
-  // useEffect(() => {
-  //   try {
-  //     if (messages.length) {
-  //       localStorage.setItem('chatMessages', JSON.stringify(messages));
-  //       console.log('Saved messages to localStorage:', messages);
-  //     }
-
-  //   } catch (error) {
-  //     console.error('Error saving messages to localStorage:', error);
-  //   }
-  // }, [messages]);
-
-  // Scroll to bottom of chat when messages change
-
   useEffect(() => {
     const fetchChatHistory = async () => {
+      setLoading(true);
       try {
         const response = await api.get(`chat/history/${sessionId}/`);
         const fetchedMessages = response.data.messages.map(msg => ({
@@ -99,6 +70,8 @@ const ChatPage = () => {
         setMessages(fetchedMessages);
       } catch (error) {
         console.error('Error fetching chat history:', error);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -364,4 +337,17 @@ const InputContainer = styled.div`
   border-top: 1px solid #ddd;
   border-bottom-left-radius: 8px;
   border-bottom-right-radius: 8px;
+`;
+
+const LoadingContainer = styled.div`
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    width: 100vw;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background-color: rgba(255, 255, 255, 0.8);
+    z-index: 9999;
 `;

@@ -10,7 +10,6 @@ import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
-import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from './AuthContext';
@@ -18,8 +17,8 @@ import api from './api';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Paper from '@mui/material/Paper';
-import signInSideBg from './sign-in-side-bg.png'; // Make sure the path is correct
-import { Oval } from 'react-loader-spinner';
+// import signInSideBg from './sign-in-side-bg.png'; // Make sure the path is correct
+import signInSideBg from './Ecomaitech.com.png' // Make sure the path is correct
 import styled from 'styled-components';
 
 // TODO remove, this demo shouldn't need to reset the theme.
@@ -39,10 +38,7 @@ export default function SignIn() {
 
     const handleNavigate = (event) => {
         event.preventDefault();
-        setLoading(true);
-        setTimeout(() => {
-            navigate('/signup');
-        }, 1000);
+        navigate('/signup');
     };
 
     const handleSubmit = async (event) => {
@@ -56,7 +52,7 @@ export default function SignIn() {
         if (!email || !password) {
             toast.error('Please enter both email and password.', {
                 position: 'top-right',
-                autoClose: 5000,
+                autoClose: 3000,
                 hideProgressBar: false,
                 closeOnClick: true,
                 pauseOnHover: true,
@@ -69,15 +65,6 @@ export default function SignIn() {
         try {
             // Send login request
             const response = await api.post('auth/users/login/', { email, password });
-            toast('Login successful!', {
-                position: 'top-right',
-                autoClose: 5000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-            });
             console.log('Sign in successful:', response.data);
             const { token } = response.data;
 
@@ -108,7 +95,7 @@ export default function SignIn() {
 
             toast.error(errorMsg, {
                 position: 'top-right',
-                autoClose: 5000,
+                autoClose: 3000,
                 hideProgressBar: false,
                 closeOnClick: true,
                 pauseOnHover: true,
@@ -119,113 +106,95 @@ export default function SignIn() {
     };
 
     return (
-        <>
-            {loading ? (
-                <LoadingContainer>
-                    <Oval
-                        height={100}
-                        width={100}
-                        color="#4fa94d"
-                        wrapperStyle={{}}
-                        wrapperClass=""
-                        visible={true}
-                        ariaLabel='oval-loading'
-                        secondaryColor="#4fa94d"
-                        strokeWidth={2}
-                        strokeWidthSecondary={2}
-                    />
-                </LoadingContainer>
-            ) : (
-                <ThemeProvider theme={defaultTheme}>
-                    <Grid container component="main" sx={{ height: '100vh' }}>
-                        <CssBaseline />
-                        <Grid
-                            item
-                            xs={false}
-                            sm={4}
-                            md={7}
-                            sx={{
-                                backgroundImage: `url(${signInSideBg})`,
-                                backgroundColor: (t) =>
-                                    t.palette.mode === 'light' ? t.palette.grey[50] : t.palette.grey[900],
-                                backgroundSize: 'cover',
-                                backgroundPosition: 'left',
-                            }}
-                        />
-                        <Grid item xs={12} sm={8} md={5} component={Paper} elevation={6} square>
-                            <Box
-                                sx={{
-                                    my: 8,
-                                    mx: 4,
-                                    display: 'flex',
-                                    flexDirection: 'column',
-                                    alignItems: 'center',
-                                }}
+        <ThemeProvider theme={defaultTheme}>
+            <Grid container component="main" sx={{ height: '100vh' }}>
+                <CssBaseline />
+                <Grid
+                    item
+                    xs={false}
+                    sm={4}
+                    md={7}
+                    sx={{
+                        backgroundImage: `url(${signInSideBg})`,
+                        backgroundColor: (t) =>
+                            t.palette.mode === 'light' ? t.palette.grey[50] : t.palette.grey[900],
+                        backgroundSize: 'cover',
+                        backgroundPosition: 'left',
+                    }}
+                />
+                <Grid item xs={12} sm={8} md={5} component={Paper} elevation={6} square>
+                    <Box
+                        sx={{
+                            my: 8,
+                            mx: 4,
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                        }}
+                    >
+                        <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
+                            <LockOutlinedIcon />
+                        </Avatar>
+                        <Typography component="h1" variant="h5">
+                            Sign in
+                        </Typography>
+                        <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 1 }}>
+                            <TextField
+                                margin="normal"
+                                required
+                                fullWidth
+                                id="email"
+                                label="Email Address"
+                                name="email"
+                                autoComplete="email"
+                                autoFocus
+                            />
+                            <TextField
+                                margin="normal"
+                                required
+                                fullWidth
+                                name="password"
+                                label="Password"
+                                type="password"
+                                id="password"
+                                autoComplete="current-password"
+                            />
+                            <FormControlLabel
+                                control={<Checkbox value="remember" color="primary" />}
+                                label="Remember me"
+                            />
+                            <Button
+                                type="submit"
+                                fullWidth
+                                variant="contained"
+                                sx={{ mt: 3, mb: 2 }}
                             >
-                                <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
-                                    <LockOutlinedIcon />
-                                </Avatar>
-                                <Typography component="h1" variant="h5">
-                                    Sign in
-                                </Typography>
-                                <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 1 }}>
-                                    <TextField
-                                        margin="normal"
-                                        required
-                                        fullWidth
-                                        id="email"
-                                        label="Email Address"
-                                        name="email"
-                                        autoComplete="email"
-                                        autoFocus
-                                    />
-                                    <TextField
-                                        margin="normal"
-                                        required
-                                        fullWidth
-                                        name="password"
-                                        label="Password"
-                                        type="password"
-                                        id="password"
-                                        autoComplete="current-password"
-                                    />
-                                    <FormControlLabel
-                                        control={<Checkbox value="remember" color="primary" />}
-                                        label="Remember me"
-                                    />
-                                    <Button
-                                        type="submit"
-                                        fullWidth
-                                        variant="contained"
-                                        sx={{ mt: 3, mb: 2 }}
+                                Sign In
+                            </Button>
+                            <Grid container>
+                                <Grid item xs>
+                                    <Link href="#" variant="body2">
+                                        Forgot password?
+                                    </Link>
+                                </Grid>
+                                <Grid item>
+                                    <Link
+                                        onClick={handleNavigate}
+                                        variant="body2"
+                                        sx={{ cursor: 'pointer' }} // Ensure the cursor is a pointer
                                     >
-                                        Sign In
-                                    </Button>
-                                    <Grid container>
-                                        <Grid item xs>
-                                            <Link href="#" variant="body2">
-                                                Forgot password?
-                                            </Link>
-                                        </Grid>
-                                        <Grid item>
-                                            <Link
-                                                onClick={handleNavigate}
-                                                variant="body2"
-                                                sx={{ cursor: 'pointer' }} // Ensure the cursor is a pointer
-                                            >
-                                                {"Don't have an account? Sign Up"}
-                                            </Link>
-                                        </Grid>
-                                    </Grid>
-                                    <Copyright sx={{ mt: 5 }} />
-                                </Box>
-                            </Box>
-                        </Grid>
-                    </Grid>
-                    <ToastContainer />
-                </ThemeProvider>
-            )}
-        </>
+                                        {"Don't have an account? Sign Up"}
+                                    </Link>
+                                </Grid>
+                            </Grid>
+                            <Copyright sx={{ mt: 5 }} />
+                        </Box>
+                    </Box>
+                </Grid>
+            </Grid>
+            <ToastContainer />
+        </ThemeProvider>
+
     );
 }
 

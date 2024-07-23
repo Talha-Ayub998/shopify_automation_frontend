@@ -30,9 +30,7 @@ export const AuthProvider = ({ children }) => {
             const token = localStorage.getItem('authToken');
             setIsAuthenticated(!!token);
             // Set a 2-second delay before removing the loading state
-            setTimeout(() => {
-                setIsLoading(false);
-            }, 2000);
+            setIsLoading(false);
         };
 
         window.addEventListener('storage', checkAuth);
@@ -48,19 +46,16 @@ export const AuthProvider = ({ children }) => {
     };
 
     const logout = () => {
-        setIsLoggingOut(true); // Set logging out state to true
-        setTimeout(() => {
-            localStorage.removeItem('authToken');
-            localStorage.removeItem('userId');
-            localStorage.removeItem('sessionId');
-            localStorage.removeItem('userEmail');
-            setIsAuthenticated(false);
-            navigate('/signin');
-            setIsLoggingOut(false); // Reset logging out state
-        }, 1000); // Delay before removing items and navigating
+        localStorage.removeItem('authToken');
+        localStorage.removeItem('userId');
+        localStorage.removeItem('sessionId');
+        localStorage.removeItem('userEmail');
+        setIsAuthenticated(false);
+        navigate('/signin');
+        setIsLoggingOut(false); // Reset logging out state
     };
 
-    if (isLoading || isLoggingOut) { // Show spinner if loading or logging out
+    if (isLoading) { // Show spinner if loading or logging out
         return (
             <LoadingContainer>
                 <Oval

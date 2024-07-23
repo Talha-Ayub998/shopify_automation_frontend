@@ -29,19 +29,14 @@ export default function SignUp() {
     useEffect(() => {
         if (mfaEnabled) {
             setLoading(true);
+            navigate('/2fa');
             // Delay the navigation to allow the loader to be visible
-            setTimeout(() => {
-                navigate('/2fa');
-            }, 2000); // Adjust the delay as needed
         }
     }, [mfaEnabled, navigate]);
 
     const handleNavigate = (event) => {
         event.preventDefault();
-        setLoading(true);
-        setTimeout(() => {
-            navigate('/signin');
-        }, 1000);
+        navigate('/signin');
     };
 
     const handleSubmit = async (event) => {
@@ -57,7 +52,7 @@ export default function SignUp() {
         if (!username || !email || !password || !shopifyStoreUrl || !shopifyAccessToken) {
             toast.error('All fields are required.', {
                 position: 'top-right',
-                autoClose: 5000,
+                autoClose: 3000,
                 hideProgressBar: false,
                 closeOnClick: true,
                 pauseOnHover: true,
@@ -66,10 +61,9 @@ export default function SignUp() {
             });
             return;
         }
-
-
         try {
             // Send the registration request
+            setLoading(true);
             const response = await api.post('auth/users/register/', {
                 username,
                 email,
@@ -78,22 +72,10 @@ export default function SignUp() {
                 shopify_access_token: shopifyAccessToken,
             });
             // console.log('Sign up successful:', response.data);
+            setMfaEnabled(true);
             console.log('Sign up successful:', response.data);
             localStorage.setItem('userId', response.data.user_id);
             localStorage.setItem('userEmail', response.data.user_email);
-            setMfaEnabled(true);
-            // localStorage.setItem('sessionId', response.data.session_id);
-            // localStorage.setItem('userEmail', response.data.user.email);
-
-            // Assuming the sign-up response includes a token
-            // const { token } = response.data;
-            // if (token) {
-            //     login(token); // Update authentication state
-            //     navigate('/chatpage'); // Redirect to chat page
-            // } else {
-            //     // If no token is returned, redirect to login page
-            //     navigate('/signin');
-            // }
         } catch (error) {
             console.error('Sign up error:', error.response?.data);
 
@@ -115,7 +97,7 @@ export default function SignUp() {
 
             toast.error(errorMsg, {
                 position: 'top-right',
-                autoClose: 5000,
+                autoClose: 3000,
                 hideProgressBar: false,
                 closeOnClick: true,
                 pauseOnHover: true,
@@ -123,11 +105,14 @@ export default function SignUp() {
                 progress: undefined,
             });
         }
+        finally {
+            setLoading(false);
+        }
     };
 
     return (
         <>
-            {loading ? (
+            {loading &&
                 <LoadingContainer>
                     <Oval
                         height={100}
@@ -142,115 +127,114 @@ export default function SignUp() {
                         strokeWidthSecondary={2}
                     />
                 </LoadingContainer>
-            ) : (
-                <ThemeProvider theme={theme}>
-                    <Container component="main" maxWidth="xs">
-                        <CssBaseline />
-                        <Box
-                            sx={{
-                                marginTop: 8,
-                                display: 'flex',
-                                flexDirection: 'column',
-                                alignItems: 'center',
-                            }}
-                        >
-                            <Avatar sx={{ m: 1, bgcolor: theme.palette.secondary.main }}>
-                                <LockOutlinedIcon />
-                            </Avatar>
-                            <Typography component="h1" variant="h5">
-                                Sign up
-                            </Typography>
-                            <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 3 }}>
-                                <Grid container spacing={2}>
-                                    <Grid item xs={12}>
-                                        <TextField
-                                            autoComplete="given-name"
-                                            name="username"
-                                            required
-                                            fullWidth
-                                            id="username"
-                                            label="Username"
-                                            autoFocus
-                                        />
-                                    </Grid>
-                                    <Grid item xs={12}>
-                                        <TextField
-                                            required
-                                            fullWidth
-                                            id="email"
-                                            label="Email Address"
-                                            name="email"
-                                            autoComplete="email"
-                                        />
-                                    </Grid>
-                                    <Grid item xs={12}>
-                                        <TextField
-                                            required
-                                            fullWidth
-                                            name="password"
-                                            label="Password"
-                                            type="password"
-                                            id="password"
-                                            autoComplete="new-password"
-                                        />
-                                    </Grid>
-                                    <Grid item xs={12} sm={6}>
-                                        <TextField
-                                            required
-                                            fullWidth
-                                            id="shopifyUrl"
-                                            label="Shopify Url"
-                                            name="shopifyUrl"
-                                            autoComplete="shopifyUrl"
-                                        />
-                                    </Grid>
-                                    <Grid item xs={12} sm={6}>
-                                        <TextField
-                                            required
-                                            fullWidth
-                                            id="accessToken"
-                                            label="Access Token"
-                                            name="accessToken"
-                                            autoComplete="accessToken"
-                                        />
-                                    </Grid>
-                                    <Grid item xs={12}>
-                                        <FormControlLabel
-                                            control={<Checkbox value="allowExtraEmails" color="primary" />}
-                                            label="I want to receive inspiration, marketing promotions and updates via email."
-                                            name="allowExtraEmails"
-                                        />
-                                    </Grid>
+            }
+            <ThemeProvider theme={theme}>
+                <Container component="main" maxWidth="xs">
+                    <CssBaseline />
+                    <Box
+                        sx={{
+                            marginTop: 8,
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                        }}
+                    >
+                        <Avatar sx={{ m: 1, bgcolor: theme.palette.secondary.main }}>
+                            <LockOutlinedIcon />
+                        </Avatar>
+                        <Typography component="h1" variant="h5">
+                            Sign up
+                        </Typography>
+                        <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 3 }}>
+                            <Grid container spacing={2}>
+                                <Grid item xs={12}>
+                                    <TextField
+                                        autoComplete="given-name"
+                                        name="username"
+                                        required
+                                        fullWidth
+                                        id="username"
+                                        label="Username"
+                                        autoFocus
+                                    />
                                 </Grid>
-                                <Button
-                                    type="submit"
-                                    fullWidth
-                                    variant="contained"
-                                    color="primary"
-                                    sx={{ mt: 3, mb: 2 }}
-                                >
-                                    Sign Up
-                                </Button>
-                                <Grid container justifyContent="flex-end">
-                                    <Grid item>
-                                        <Link
-                                            onClick={handleNavigate}
-                                            variant="body2"
-                                            sx={{
-                                                cursor: 'pointer' // Ensure the cursor is a pointer
-                                            }}
-                                        >
-                                            {"Don't have an account? Sign Up"}
-                                        </Link>
-                                    </Grid>
+                                <Grid item xs={12}>
+                                    <TextField
+                                        required
+                                        fullWidth
+                                        id="email"
+                                        label="Email Address"
+                                        name="email"
+                                        autoComplete="email"
+                                    />
                                 </Grid>
-                            </Box>
+                                <Grid item xs={12}>
+                                    <TextField
+                                        required
+                                        fullWidth
+                                        name="password"
+                                        label="Password"
+                                        type="password"
+                                        id="password"
+                                        autoComplete="new-password"
+                                    />
+                                </Grid>
+                                <Grid item xs={12} sm={6}>
+                                    <TextField
+                                        required
+                                        fullWidth
+                                        id="shopifyUrl"
+                                        label="Shopify Url"
+                                        name="shopifyUrl"
+                                        autoComplete="shopifyUrl"
+                                    />
+                                </Grid>
+                                <Grid item xs={12} sm={6}>
+                                    <TextField
+                                        required
+                                        fullWidth
+                                        id="accessToken"
+                                        label="Access Token"
+                                        name="accessToken"
+                                        autoComplete="accessToken"
+                                    />
+                                </Grid>
+                                <Grid item xs={12}>
+                                    <FormControlLabel
+                                        control={<Checkbox value="allowExtraEmails" color="primary" />}
+                                        label="I want to receive inspiration, marketing promotions and updates via email."
+                                        name="allowExtraEmails"
+                                    />
+                                </Grid>
+                            </Grid>
+                            <Button
+                                type="submit"
+                                fullWidth
+                                variant="contained"
+                                color="primary"
+                                sx={{ mt: 3, mb: 2 }}
+                            >
+                                Sign Up
+                            </Button>
+                            <Grid container justifyContent="flex-end">
+                                <Grid item>
+                                    <Link
+                                        onClick={handleNavigate}
+                                        variant="body2"
+                                        sx={{
+                                            cursor: 'pointer' // Ensure the cursor is a pointer
+                                        }}
+                                    >
+                                        {"Don't have an account? Sign Up"}
+                                    </Link>
+                                </Grid>
+                            </Grid>
                         </Box>
-                        <Copyright sx={{ mt: 8, mb: 4 }} />
-                    </Container>
-                    <ToastContainer />
-                </ThemeProvider>
-            )}
+                    </Box>
+                    <Copyright sx={{ mt: 8, mb: 4 }} />
+                </Container>
+                <ToastContainer />
+            </ThemeProvider>
         </>
     );
 }
