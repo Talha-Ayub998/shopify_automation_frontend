@@ -5,7 +5,11 @@ import { useAuth } from './AuthContext'; // Make sure this path is correct
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import api from './api';
+import { FaLock, FaSignOutAlt } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom';
+
 import { Oval } from 'react-loader-spinner';
+import logo from './Ecomaitech.com-logo.png' // Make sure the path is correct
 
 const ChatPage = () => {
   const [messages, setMessages] = useState([]);
@@ -16,10 +20,8 @@ const ChatPage = () => {
   const sessionId = localStorage.getItem('sessionId');
   const userEmail = localStorage.getItem('userEmail');
   const [loading, setLoading] = useState(false);
-
-  const handleLogout = () => {
-    logout();
-  };
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (loginSuccess) {
@@ -130,6 +132,24 @@ const ChatPage = () => {
   };
 
 
+  const getInitials = (email) => {
+    if (!email) return '';
+    const initials = email.slice(0, 2).toUpperCase();
+    return initials;
+  };
+
+  const toggleDropdown = () => {
+    setDropdownOpen(!dropdownOpen);
+  };
+
+  const handleLogout = () => {
+    logout();
+  };
+
+  const handleChangePassword = () => {
+    navigate('/resetpassword')
+  };
+
 
   return (
     <PageWrapper>
@@ -150,9 +170,18 @@ const ChatPage = () => {
       <ChatPageContainer>
         <Header>
           <HeaderContent>
-            <UserEmail>{userEmail}</UserEmail> {/* Add this line */}
-            <Title>Chat with Bot</Title>
-            <LogoutButton onClick={handleLogout}>Logout</LogoutButton>
+            <Logo src={logo} alt="Logo" />
+            <UserEmail onClick={toggleDropdown}>{getInitials(userEmail)}</UserEmail>
+            <DropdownMenu open={dropdownOpen}>
+              <MenuItem onClick={handleChangePassword}>
+                <Icon><FaLock /></Icon>
+                Change Password
+              </MenuItem>
+              <MenuItem onClick={handleLogout}>
+                <Icon><FaSignOutAlt /></Icon>
+                Logout
+              </MenuItem>
+            </DropdownMenu>
           </HeaderContent>
         </Header>
         <Body ref={bodyRef}>
@@ -185,33 +214,64 @@ const ChatPage = () => {
 export default ChatPage;
 
 
+const Logo = styled.img`
+  height: 75px;
+  margin: 8px 0 0 1rem;
+`;
 const Title = styled.div`
   font-size: 24px;
   margin: 0 0px 0 -55px /* Add some margin to create space between elements */
 `;
 
-const LogoutButton = styled.button`
-  padding: 8px 16px;
-  border: none;
-  border-radius: 5px;
-  background-color: #444654;
-  color: white;
-  font-size: 16px;
-  cursor: pointer;
+// const LogoutButton = styled.button`
+//   padding: 8px 16px;
+//   border: none;
+//   border-radius: 5px;
+//   background-color: #444654;
+//   color: white;
+//   font-size: 16px;
+//   cursor: pointer;
 
-  &:hover {
-    background-color: #3a3b3d;
-  }
-`;
+//   &:hover {
+//     background-color: #3a3b3d;
+//   }
+// `;
+
+// const DropdownMenu = styled.div`
+//   position: absolute;
+//   top: 50px; /* Adjust based on your layout */
+//   right: 0;
+//   background-color: #444654;
+//   color: #ffffff;
+//   border-radius: 5px;
+//   box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+//   display: ${({ open }) => (open ? 'block' : 'none')};
+//   z-index: 1000;
+// `;
+
+// const LogoutButton = styled.button`
+//   background-color: #f00;
+//   color: #fff;
+//   border: none;
+//   border-radius: 5px;
+//   padding: 10px;
+//   cursor: pointer;
+//   &:hover {
+//     background-color: #c00;
+//   }
+// `;
 
 
 const Message = styled.div`
-  margin-bottom: 10px;
-  padding: 10px;
+  margin-bottom: ${(props) => (props.isSameSender ? "5px" : "15px")};
+  padding: 10px 20px;
   background-color: ${props => (props.isSender ? '#e7e7e8' : '#d2e3fc')};
   border: 1px solid ${props => (props.isSender ? '#ccc' : '#aaa')}; /* Add some border to give it a more chat-like feel */
   border-radius: 5px;
   max-width: 60%;
+  word-wrap: break-word;
+  align-self: ${(props) => (props.isSender ? "flex-end" : "flex-start")};
+  border-radius: ${(props) => (props.isSender ? "20px 20px 0 20px" : "20px 20px 20px 0")};
   float: ${props => (props.isSender ? 'right' : 'left')}; /* Use float to align the messages */
   clear: both; /* Add clear:both to prevent overlapping */
   margin: 10px; /* Add some margin to prevent overlapping */
@@ -290,7 +350,52 @@ const ChatPageContainer = styled.div`
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 `;
 
+const DropdownMenu = styled.div`
+  position: absolute;
+  top: 65px;
+  right: 10px;
+  background-color: #444654;
+  color: #ffffff;
+  border-radius: 5px;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+  display: ${({ open }) => (open ? 'block' : 'none')};
+  padding: 10px;
+  z-index: 1000;
+  min-width: 200px;
+`;
+
+const MenuItem = styled.div`
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  color: #ffffff;
+  cursor: pointer;
+
+  &:hover {
+    background-color: #555555;
+  }
+`;
+
+const Icon = styled.div`
+  margin-right: 10px;
+`;
+
+const LogoutButton = styled.button`
+  background-color: #f00;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  padding: 10px;
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+  &:hover {
+    background-color: #c00;
+  }
+`;
+
 const Header = styled.div`
+  padding: 10px 20px;
   height: 60px;
   background-color: #202123;
   color: white;
@@ -298,9 +403,11 @@ const Header = styled.div`
   align-items: center;
   justify-content: center;
   position: relative;
-  padding: 0 20px;
+  padding: 2px 20px;
   border-top-left-radius: 8px;
   border-top-right-radius: 8px;
+  border-bottom: 1px solid #444;
+  justify-content: space-between;
 `;
 
 const HeaderContent = styled.div`
@@ -311,14 +418,23 @@ const HeaderContent = styled.div`
   padding: 0 20px; /* Add some padding to create space between elements */
 `;
 
-const UserEmail = styled.div`
-  font-size: 15px;
-  color: #ffffff; /* White text */
-  background-color: #444654; /* Blue background */
-  padding: 5px 10px; /* Add some padding to create a box-like effect */
-  border-radius: 5px; /* Add a slight rounded corner effect */
-  display: inline-block; /* Make it an inline-block element */
-  box-shadow: 0 0 5px rgba(0, 0, 0, 0.2); /* Add a subtle shadow effect */
+const UserEmail = styled.span`
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 0.2rem;
+  background-color: #555;
+  color: #fff;
+  border-radius: 50%;
+  text-align: center;
+  width: 35px;
+  height: 35px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &:hover {
+    background-color: #777;
+  }
 `;
 
 const Body = styled.div`

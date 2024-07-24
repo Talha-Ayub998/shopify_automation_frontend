@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from './AuthContext';
 import axios from 'axios';
+import styled from 'styled-components';
 
 
 
@@ -84,110 +85,114 @@ const TwoFactorAuth = () => {
     }
 
     return (
-        <div style={styles.container}>
-            <div style={styles.mailIcon}>📧</div>
-            <h2 style={styles.title}>We've emailed you a code</h2>
-            <p style={styles.description}>
+        <Container>
+            <MailIcon>📧</MailIcon>
+            <Title>We've emailed you a code</Title>
+            <Description>
                 To continue account setup, enter the code we've sent to: <strong>{email}</strong>
-            </p>
-            <div>
-                {otp.map((data, index) => {
-                    return (
-                        <input
-                            type="text"
-                            name="otp"
-                            maxLength="1"
-                            key={index}
-                            value={data}
-                            onChange={e => handleChange(e.target, index)}
-                            onFocus={e => e.target.select()}
-                            onKeyDown={e => handleKeyDown(e, index)}
-                            style={styles.codeInput}
-                        />
-                    );
-                })}
-            </div>
-            {error && <div style={styles.error}>{error}</div>}
-            <button onClick={handleVerifyOtp} style={styles.verifyButton}>
-                Verify
-            </button>
-            <div style={styles.resend}>
+            </Description>
+            <CodeInputs>
+                {otp.map((data, index) => (
+                    <CodeInput
+                        type="text"
+                        name="otp"
+                        maxLength="1"
+                        key={index}
+                        value={data}
+                        onChange={e => handleChange(e.target, index)}
+                        onFocus={e => e.target.select()}
+                        onKeyDown={e => handleKeyDown(e, index)}
+                    />
+                ))}
+            </CodeInputs>
+            {error && <Error>{error}</Error>}
+            <VerifyButton onClick={handleVerifyOtp}>Verify</VerifyButton>
+            <Resend>
                 <span>Didn't get the code?</span>
-                <a href="#" style={styles.resendLink} onClick={handleResendOtp}>Resend it</a>
-            </div>
-            <button onClick={handleBack} style={styles.backButton}>Back</button>
-        </div>
+                <ResendLink href="#" onClick={handleResendOtp}>Resend it</ResendLink>
+            </Resend>
+            <BackButton onClick={handleBack}>Back</BackButton>
+        </Container>
     );
 };
 
-const styles = {
-    container: {
-        textAlign: 'center',
-        backgroundColor: 'white',
-        padding: '40px',
-        borderRadius: '10px',
-        boxShadow: '0px 0px 5px rgba(0, 0, 0, 0.1)', // Reduce the blur effect
-        maxWidth: '400px',
-        margin: '0 auto',
-        marginTop: '100px',
-    },
-    mailIcon: {
-        fontSize: '40px',
-        marginBottom: '20px',
-    },
-    title: {
-        margin: '0',
-        fontSize: '24px',
-    },
-    description: {
-        margin: '10px 0 20px',
-    },
-    codeInputs: {
-        display: 'flex',
-        justifyContent: 'center',
-        marginBottom: '20px',
-    },
-    codeInput: {
-        width: '40px',
-        height: '40px',
-        margin: '0 5px',
-        textAlign: 'center',
-        fontSize: '20px',
-        border: '1px solid #ddd',
-        borderRadius: '5px',
-    },
-    error: {
-        color: 'red',
-        marginBottom: '20px',
-    },
-    verifyButton: {
-        display: 'inline-block',
-        width: '100%',
-        padding: '10px',
-        margin: '10px 0',
-        fontSize: '16px',
-        backgroundColor: 'black',
-        color: 'white',
-        border: 'none',
-        borderRadius: '5px',
-        cursor: 'pointer',
-    },
-    resend: {
-        margin: '20px 0',
-    },
-    resendLink: {
-        color: '#007bff',
-        textDecoration: 'none',
-        marginLeft: '5px',
-    },
-    backButton: {
-        background: 'none',
-        border: 'none',
-        color: '#007bff',
-        cursor: 'pointer',
-        fontSize: '16px',
-    }
-};
 
 export default TwoFactorAuth;
 
+
+const Container = styled.div`
+    text-align: center;
+    background-color: white;
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1); // Reduce the blur effect
+    max-width: 400px;
+    margin: 0 auto;
+    margin-top: 100px;
+`;
+
+const MailIcon = styled.div`
+    font-size: 40px;
+    margin-bottom: 20px;
+`;
+
+const Title = styled.h2`
+    margin: 0;
+    font-size: 24px;
+`;
+
+const Description = styled.p`
+    margin: 10px 0 20px;
+`;
+
+const CodeInputs = styled.div`
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+`;
+
+const CodeInput = styled.input`
+    width: 40px;
+    height: 40px;
+    margin: 0 5px;
+    text-align: center;
+    font-size: 20px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+`;
+
+const Error = styled.div`
+    color: red;
+    margin-bottom: 20px;
+`;
+
+const VerifyButton = styled.button`
+    display: inline-block;
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    font-size: 16px;
+    background-color: #1976D2;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+`;
+
+const Resend = styled.div`
+    margin: 20px 0;
+`;
+
+const ResendLink = styled.a`
+    color: #007bff;
+    text-decoration: none;
+    margin-left: 5px;
+`;
+
+const BackButton = styled.button`
+    background: none;
+    border: none;
+    color: #007bff;
+    cursor: pointer;
+    font-size: 16px;
+`;
