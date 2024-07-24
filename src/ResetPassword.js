@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
-
+import api from './api';
+import { Oval } from 'react-loader-spinner';
+import { ToastContainer, toast } from 'react-toastify';
+import { useAuth } from './AuthContext';
 
 const ResetPassword = () => {
     const [email, setEmail] = useState('');
@@ -9,7 +12,9 @@ const ResetPassword = () => {
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [error, setError] = useState('');
+    const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
+    const { setPasswordChanges } = useAuth();
 
 
     // Handle input changes
@@ -28,38 +33,59 @@ const ResetPassword = () => {
     // Handle password reset
     const handleResetPassword = async () => {
         setError('');
+        if (!newPassword || !confirmPassword || !oldPassword) {
+            toast.error('All fields are required.', {
+                position: 'top-right',
+                autoClose: 3000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+            });
+            return;
+        }
 
         // Check if passwords match
         if (newPassword !== confirmPassword) {
             setError('Passwords do not match');
+            toast.error('Passwords do not match', {
+                position: 'top-right',
+                autoClose: 3000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+            });
             return;
         }
-
+        setLoading(true);
         try {
-            // Replace with your password reset API endpoint and method
-            const response = await fetch('/api/reset-password', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    email,
-                    oldPassword,
-                    newPassword,
-                }),
-            });
-
-            const data = await response.json();
-
-            if (response.ok) {
-                // Handle success (e.g., redirect to login page)
-                console.log('Password reset successful');
-                // Redirect or show success message
-            } else {
-                setError(data.message || 'An error occurred');
-            }
+            const response = await api.post('auth/users/change-password/', { new_password: newPassword, current_password: oldPassword });
+            setPasswordChanges(true);
+            navigate('/chatpage')
         } catch (error) {
-            setError('An error occurred');
+            console.log(error.response.data);
+            let errorMsg = error.message || 'An error occurred'; // Default message
+            if (error.response.data) {
+                // Extract detailed error messages if available
+                errorMsg = Object.values(error.response.data).flat().join(', ');
+            } else {
+                // Fallback message if response data is empty
+                errorMsg = error.response.statusText || 'An error occurred';
+            }
+            toast.error(errorMsg, {
+                position: 'top-right',
+                autoClose: 3000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+            });
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -72,30 +98,53 @@ const ResetPassword = () => {
     };
 
     return (
-        <Container>
-            <MailIcon>🔑</MailIcon>
-            <Title>Password reset</Title>
-            <Description>
-                Set a new password
-            </Description>
-            <Input
-                type="password"
-                name="newPassword"
-                placeholder="New Password"
-                value={newPassword}
-                onChange={e => handleChange(e.target.name, e.target.value)}
-            />
-            <Input
-                type="password"
-                name="confirmPassword"
-                placeholder="Confirm Password"
-                value={confirmPassword}
-                onChange={e => handleChange(e.target.name, e.target.value)}
-            />
-            {error && <Error>{error}</Error>}
-            <ResetButton onClick={handleResetPassword}>Reset Password</ResetButton>
-            <BackButton onClick={handleBack}>Back</BackButton>
-        </Container>
+        <>
+            <Container>
+                {loading && (
+                    <LoadingContainer>
+                        <Oval
+                            height={100}
+                            width={100}
+                            color="#4fa94d"
+                            visible={true}
+                            ariaLabel='oval-loading'
+                            secondaryColor="#4fa94d"
+                            strokeWidth={2}
+                            strokeWidthSecondary={2}
+                        />
+                    </LoadingContainer>
+                )}
+                <MailIcon>🔑</MailIcon>
+                <Title>Password reset</Title>
+                <Description>
+                    Set a new password
+                </Description>
+                <Input
+                    type="password"
+                    name="oldPassword"
+                    placeholder="Old Password"
+                    value={oldPassword}
+                    onChange={e => handleChange(e.target.name, e.target.value)}
+                />
+                <Input
+                    type="password"
+                    name="newPassword"
+                    placeholder="New Password"
+                    value={newPassword}
+                    onChange={e => handleChange(e.target.name, e.target.value)}
+                />
+                <Input
+                    type="password"
+                    name="confirmPassword"
+                    placeholder="Confirm Password"
+                    value={confirmPassword}
+                    onChange={e => handleChange(e.target.name, e.target.value)}
+                />
+                <ResetButton onClick={handleResetPassword}>Reset Password</ResetButton>
+                <BackButton onClick={handleBack}>Back</BackButton>
+            </Container>
+            <ToastContainer />
+        </>
     );
 };
 
@@ -142,6 +191,19 @@ const Input = styled.input`
 const Error = styled.div`
     color: red;
     margin-bottom: 20px;
+`;
+
+const LoadingContainer = styled.div`
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    width: 100vw;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background-color: rgba(255, 255, 255, 0.8);
+    z-index: 9999;
 `;
 
 const ResetButton = styled.button`

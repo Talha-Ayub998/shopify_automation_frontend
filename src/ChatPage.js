@@ -5,7 +5,7 @@ import { useAuth } from './AuthContext'; // Make sure this path is correct
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import api from './api';
-import { FaLock, FaSignOutAlt } from 'react-icons/fa';
+import { FaLock, FaSignOutAlt, FaEnvelope } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 
 import { Oval } from 'react-loader-spinner';
@@ -15,7 +15,7 @@ const ChatPage = () => {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const bodyRef = useRef(null);
-  const { logout, loginSuccess, setLoginSuccess } = useAuth();
+  const { logout, loginSuccess, setLoginSuccess, passwordChanges, setPasswordChanges } = useAuth();
   const userId = localStorage.getItem('userId');
   const sessionId = localStorage.getItem('sessionId');
   const userEmail = localStorage.getItem('userEmail');
@@ -37,6 +37,22 @@ const ChatPage = () => {
     }
     setLoginSuccess(false); // Reset login success flag
   }, [loginSuccess, setLoginSuccess]);
+
+
+  useEffect(() => {
+    if (passwordChanges) {
+      toast.success('Password reset successful!', {
+        position: 'top-right',
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
+    }
+    setPasswordChanges(false); // Reset login success flag
+  }, [passwordChanges, setPasswordChanges]);
 
   // Load messages from localStorage when the component mounts
   useEffect(() => {
@@ -173,6 +189,10 @@ const ChatPage = () => {
             <Logo src={logo} alt="Logo" />
             <UserEmail onClick={toggleDropdown}>{getInitials(userEmail)}</UserEmail>
             <DropdownMenu open={dropdownOpen}>
+              <MenuItem>
+                <Icon><FaEnvelope /></Icon>
+                {userEmail}
+              </MenuItem>
               <MenuItem onClick={handleChangePassword}>
                 <Icon><FaLock /></Icon>
                 Change Password
