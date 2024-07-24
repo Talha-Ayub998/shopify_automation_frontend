@@ -41,6 +41,11 @@ export default function SignIn() {
         navigate('/signup');
     };
 
+    const handleNavigate2 = (event) => {
+        event.preventDefault();
+        navigate('/forgetpassword');
+    };
+
     const handleSubmit = async (event) => {
         event.preventDefault(); // Prevent default form submission behavior
 
@@ -173,8 +178,12 @@ export default function SignIn() {
                             </Button>
                             <Grid container>
                                 <Grid item xs>
-                                    <Link href="#" variant="body2">
-                                        Forgot password?
+                                    <Link
+                                        onClick={handleNavigate2}
+                                        variant="body2"
+                                        sx={{ cursor: 'pointer' }} // Ensure the cursor is a pointer
+                                    >
+                                        {"Forgot password?"}
                                     </Link>
                                 </Grid>
                                 <Grid item>
