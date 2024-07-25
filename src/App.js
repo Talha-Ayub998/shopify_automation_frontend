@@ -9,6 +9,7 @@ import TwoFactorAuth from './TwoFactorAuth';
 import ResetPassword from './ResetPassword';
 import ForgotPassword from './ForgetPassword';
 import NotFound from './NotFound';
+import LandingPage from './landing-page/LandingPage';
 
 const App = () => {
   return (
@@ -18,9 +19,10 @@ const App = () => {
           <Route path="/signin" element={<SignIn />} />
           <Route path="/signup" element={<SignUp />} />
           <Route path="/2fa" element={<TwoFactorAuth />} />
+          <Route path="/landingpage" element={<LandingPage />} />
           <Route path="/resetpassword" element={<ProtectedRoute element={<ResetPassword />} />} />
           <Route path="/forgetpassword" element={<ForgotPassword />} />
-          <Route path="/" element={<SignIn />} /> {/* Default to SignIn */}
+          <Route path="/" element={<LandingPage />} /> {/* Default to SignIn */}
           <Route path="/chatpage" element={<ProtectedRoute element={<ChatPage />} />} />
           <Route path="*" element={<NotFound />} /> {/* 404 Not Found */}
         </Routes>

@@ -227,7 +227,7 @@ export default function SignUp() {
                                             cursor: 'pointer' // Ensure the cursor is a pointer
                                         }}
                                     >
-                                        {"Don't have an account? Sign Up"}
+                                        {"Already have an account? Sign in"}
                                     </Link>
                                 </Grid>
                             </Grid>
@@ -246,7 +246,7 @@ function Copyright(props) {
     return (
         <Typography variant="body2" color="text.secondary" align="center" {...props}>
             {'Copyright © '}
-            <Link color="inherit" href="#">
+            <Link color="inherit" href="/landingpage">
                 Your Website
             </Link>{' '}
             {new Date().getFullYear()}

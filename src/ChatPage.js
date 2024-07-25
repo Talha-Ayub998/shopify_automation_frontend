@@ -236,7 +236,7 @@ export default ChatPage;
 
 const Logo = styled.img`
   height: 75px;
-  margin: 8px 0 0 1rem;
+  margin: 8px 0 0 0rem;
 `;
 const Title = styled.div`
   font-size: 24px;
