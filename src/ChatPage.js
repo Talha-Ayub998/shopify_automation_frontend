@@ -283,6 +283,8 @@ const Title = styled.div`
 
 
 const Message = styled.div`
+${'' /* background-color: ${(props) => (props.isSender ? '#1a202c' : '#f5f5f5')};
+color: ${(props) => (props.isSender ? '#fff' : '#333')}; */}
   margin-bottom: ${(props) => (props.isSameSender ? "5px" : "15px")};
   padding: 10px 20px;
   background-color: ${props => (props.isSender ? '#e7e7e8' : '#d2e3fc')};
