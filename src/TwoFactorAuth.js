@@ -46,7 +46,6 @@ const TwoFactorAuth = () => {
     }, [resendDisabled]);
 
     const handleChange = (element, index) => {
-        element.preventDefault(); // Prevent default behavior
         if (isNaN(element.value)) return false;
 
         setOtp([...otp.map((d, idx) => (idx === index ? element.value : d))]);
@@ -58,13 +57,6 @@ const TwoFactorAuth = () => {
     };
 
     const handleKeyDown = (e, index) => {
-        // Handle Enter key on mobile devices
-        if (e.key === "Enter") {
-            e.preventDefault(); // Prevent form submission
-            if (index < otp.length - 1 && otp[index] !== "") {
-                document.getElementById(`otp-input-${index + 1}`).focus();
-            }
-        }
         // Handle backspace
         if (e.key === "Backspace" && otp[index] === "") {
             if (e.target.previousSibling) {
