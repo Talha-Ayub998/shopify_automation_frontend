@@ -4,6 +4,7 @@ import { useAuth } from './AuthContext';
 import axios from 'axios';
 import styled from 'styled-components';
 import api from './api';
+import { Oval } from 'react-loader-spinner';
 
 
 
@@ -16,6 +17,8 @@ const TwoFactorAuth = () => {
     const email = localStorage.getItem('userEmail');
     const [message, setMessage] = useState('');
     const [loading, setLoading] = useState(true);
+    const [timeRemaining, setTimeRemaining] = useState(60);
+    const [resendDisabled, setResendDisabled] = useState(true);
 
     useEffect(() => {
         if (!isSignupComplete) {
@@ -25,7 +28,25 @@ const TwoFactorAuth = () => {
         }
     }, [isSignupComplete, navigate]);
 
+    useEffect(() => {
+        let timer;
+        if (resendDisabled) {
+            timer = setInterval(() => {
+                setTimeRemaining(prevTime => {
+                    if (prevTime <= 1) {
+                        clearInterval(timer);
+                        setResendDisabled(false); // Enable the button when countdown ends
+                        return 0;
+                    }
+                    return prevTime - 1;
+                });
+            }, 1000);
+        }
+        return () => clearInterval(timer); // Cleanup interval on unmount
+    }, [resendDisabled]);
+
     const handleChange = (element, index) => {
+        element.preventDefault(); // Prevent default behavior
         if (isNaN(element.value)) return false;
 
         setOtp([...otp.map((d, idx) => (idx === index ? element.value : d))]);
@@ -37,6 +58,13 @@ const TwoFactorAuth = () => {
     };
 
     const handleKeyDown = (e, index) => {
+        // Handle Enter key on mobile devices
+        if (e.key === "Enter") {
+            e.preventDefault(); // Prevent form submission
+            if (index < otp.length - 1 && otp[index] !== "") {
+                document.getElementById(`otp-input-${index + 1}`).focus();
+            }
+        }
         // Handle backspace
         if (e.key === "Backspace" && otp[index] === "") {
             if (e.target.previousSibling) {
@@ -47,13 +75,43 @@ const TwoFactorAuth = () => {
 
     const handleResendOtp = async () => {
         try {
+            setLoading(true);
             const response = await api.post('auth/users/resend_otp/', { user_id });
+            setError('')
+            setOtp(new Array(6).fill(""));
             console.log('resend_otp successful:', response.data);
             setMessage(response.data.message);
+            setResendDisabled(true); // Disable the button
+            setTimeRemaining(60); // Reset the countdown timer
         } catch (error) {
             setMessage('Error resending OTP');
         }
+        finally {
+            setLoading(false);
+        }
     };
+
+    const handlePaste = (e, index) => {
+        e.preventDefault();
+        const pasteData = e.clipboardData.getData('text');
+        const digits = pasteData.replace(/\D/g, ''); // Extract only digits
+        const newOtp = [...otp];
+
+        for (let i = 0; i < digits.length; i++) {
+            if (index + i < newOtp.length) {
+                newOtp[index + i] = digits[i];
+            }
+        }
+
+        setOtp(newOtp);
+
+        // Move the focus to the next empty input field
+        const nextEmptyIndex = newOtp.findIndex(d => d === "");
+        if (nextEmptyIndex !== -1) {
+            document.getElementById(`otp-input-${nextEmptyIndex}`).focus();
+        }
+    };
+
     const handleVerifyOtp = async (e) => {
         e.preventDefault(); // Prevent form submission
         try {
@@ -81,44 +139,81 @@ const TwoFactorAuth = () => {
 
     };
 
-    if (loading) {
-        return; // Optional: Show a loading spinner or placeholder
-    }
 
     return (
-        <Container>
-            <MailIcon>📧</MailIcon>
-            <Title>We've emailed you a code</Title>
-            <Description>
-                To continue account setup, enter the code we've sent to: <strong>{email}</strong>
-            </Description>
-            <CodeInputs>
-                {otp.map((data, index) => (
-                    <CodeInput
-                        type="text"
-                        name="otp"
-                        maxLength="1"
-                        key={index}
-                        value={data}
-                        onChange={e => handleChange(e.target, index)}
-                        onFocus={e => e.target.select()}
-                        onKeyDown={e => handleKeyDown(e, index)}
+        <>
+            {loading &&
+                <LoadingContainer>
+                    <Oval
+                        height={100}
+                        width={100}
+                        color="#4fa94d"
+                        wrapperStyle={{}}
+                        wrapperClass=""
+                        visible={true}
+                        ariaLabel='oval-loading'
+                        secondaryColor="#4fa94d"
+                        strokeWidth={2}
+                        strokeWidthSecondary={2}
                     />
-                ))}
-            </CodeInputs>
-            {error && <Error>{error}</Error>}
-            <VerifyButton onClick={handleVerifyOtp}>Verify</VerifyButton>
-            <Resend>
-                <span>Didn't get the code?</span>
-                <ResendLink href="#" onClick={handleResendOtp}>Resend it</ResendLink>
-            </Resend>
-            <BackButton onClick={handleBack}>Back</BackButton>
-        </Container>
+                </LoadingContainer>
+            }
+            <Container>
+                <MailIcon>📧</MailIcon>
+                <Title>We've emailed you a code</Title>
+                <Description>
+                    To continue account setup, enter the code we've sent to: <strong>{email}</strong>
+                </Description>
+                <CodeInputs>
+                    {otp.map((data, index) => (
+                        <CodeInput
+                            id={`otp-input-${index}`}
+                            type="text"
+                            name="otp"
+                            maxLength="1"
+                            key={index}
+                            value={data}
+                            onChange={e => handleChange(e, index)}
+                            onFocus={e => e.target.select()}
+                            onKeyDown={e => handleKeyDown(e, index)}
+                            onPaste={e => handlePaste(e, index)}
+                        />
+                    ))}
+                </CodeInputs>
+                {error && <Error>{error}</Error>}
+                <VerifyButton onClick={handleVerifyOtp}>Verify</VerifyButton>
+                <Resend>
+                    <span>Didn't get the code?</span>
+                    <ResendLink
+                        href="#"
+                        onClick={handleResendOtp}
+                        style={{ pointerEvents: resendDisabled ? 'none' : 'auto', color: resendDisabled ? 'gray' : 'blue' }}
+                    >
+                        Resend it
+                    </ResendLink>
+                </Resend>
+                <BackButton onClick={handleBack}>Back</BackButton>
+            </Container>
+        </>
     );
 };
 
 
 export default TwoFactorAuth;
+
+
+const LoadingContainer = styled.div`
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    width: 100vw;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background-color: rgba(255, 255, 255, 0.8);
+    z-index: 9999;
+`;
 
 
 const Container = styled.div`

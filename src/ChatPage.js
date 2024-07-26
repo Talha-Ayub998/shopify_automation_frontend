@@ -220,13 +220,14 @@ const ChatPage = () => {
               isSender={msg.isSender}
               isSameSender={index > 0 && messages[index - 1].isSender === msg.isSender}
             >
-              {formatMessageText(msg.text)}
+              <MessageText isSender={msg.isSender}>
+                {formatMessageText(msg.text)}
+              </MessageText>
             </Message>
           ))}
         </Body>
         <InputContainer>
-          <Input
-            type="text"
+          <Textarea
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder="Type your message..."
@@ -236,7 +237,7 @@ const ChatPage = () => {
                 handleSendMessage();
               }
             }}
-            rows={4} // Adjust rows if you want to control height initially
+            rows={4} // Adjust rows to control height
           />
           <Button onClick={handleSendMessage}>Send</Button>
         </InputContainer>
@@ -249,59 +250,16 @@ const ChatPage = () => {
 
 export default ChatPage;
 
+const MessageText = styled.div`
+  text-align: left
+`;
 
 const Logo = styled.img`
   height: 75px;
   margin: 8px 0 0 0rem;
 `;
-const Title = styled.div`
-  font-size: 24px;
-  margin: 0 0px 0 -55px /* Add some margin to create space between elements */
-`;
 
-const Messagess = styled.div`
-  margin-bottom: ${(props) => (props.isSameSender ? "5px" : "15px")};
-  padding: 10px 20px;
-  background-color: ${props => (props.isSender ? '#e7e7e8' : '#d2e3fc')};
-  border: 1px solid ${props => (props.isSender ? '#ccc' : '#aaa')}; /* Add some border to give it a more chat-like feel */
-  border-radius: 5px;
-  max-width: 60%;
-  word-wrap: break-word;
-  align-self: ${(props) => (props.isSender ? "flex-end" : "flex-start")};
-  border-radius: ${(props) => (props.isSender ? "20px 20px 0 20px" : "20px 20px 20px 0")};
-  float: ${props => (props.isSender ? 'right' : 'left')}; /* Use float to align the messages */
-  clear: both; /* Add clear:both to prevent overlapping */
-  margin: 10px; /* Add some margin to prevent overlapping */
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Add some shadow to give it a 3D effect */
-  font-size: 16px;
-  font-weight: 400;
-  line-height: 1.5;
-  text-align: ${props => (props.isSender ? 'right' : 'left')}; /* Align the text to the right for user messages and left for bot messages */
-  animation: ${props => (props.isSender ? 'fadeInRight' : 'fadeInLeft')} 0.5s ease-in-out;
-  @keyframes fadeInRight {
-    0% {
-      opacity: 0;
-      transform: translateX(20px);
-    }
-    100% {
-      opacity: 1;
-      transform: translateX(0);
-    }
-  }
-  @keyframes fadeInLeft {
-    0% {
-      opacity: 0;
-      transform: translateX(-20px);
-    }
-    100% {
-      opacity: 1;
-      transform: translateX(0);
-    }
-  }
-`;
-
-
-const Input = styled.textarea`
+const Textarea = styled.textarea`
   flex: 1;
   padding: 10px;
   border: 1px solid #ddd;
@@ -364,20 +322,6 @@ const MenuItem = styled.div`
 
 const Icon = styled.div`
   margin-right: 10px;
-`;
-
-const LogoutButton = styled.button`
-  background-color: #f00;
-  color: #fff;
-  border: none;
-  border-radius: 5px;
-  padding: 10px;
-  cursor: pointer;
-  width: 100%;
-  text-align: left;
-  &:hover {
-    background-color: #c00;
-  }
 `;
 
 const Header = styled.div`
