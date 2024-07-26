@@ -46,7 +46,7 @@ const TwoFactorAuth = () => {
 
     const handleResendOtp = async () => {
         try {
-            const response = await axios.post('http://127.0.0.1:8000/api/auth/users/resend_otp/', { user_id });
+            const response = await axios.post(`${process.env.REACT_APP_API_URL}auth/users/resend_otp/`, { user_id });
             console.log('resend_otp successful:', response.data);
             setMessage(response.data.message);
         } catch (error) {
@@ -56,7 +56,7 @@ const TwoFactorAuth = () => {
     const handleVerifyOtp = async (e) => {
         e.preventDefault(); // Prevent form submission
         try {
-            const response = await axios.post('http://127.0.0.1:8000/api/auth/users/verify_otp/', {
+            const response = await axios.post(`${process.env.REACT_APP_API_URL}auth/users/verify_otp/`, {
                 otp: otp.join(''), // Join the OTP array into a string before sending it
                 user_id
             });
