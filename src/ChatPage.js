@@ -231,7 +231,7 @@ const ChatPage = () => {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder="Type your message..."
-            onKeyDown={(e) => {
+            onKeyPress={(e) => {
               if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault(); // Prevent default Enter behavior (new line)
                 handleSendMessage();
