@@ -17,7 +17,7 @@ const TwoFactorAuth = () => {
     const email = localStorage.getItem('userEmail');
     const [message, setMessage] = useState('');
     const [loading, setLoading] = useState(true);
-    const [timeRemaining, setTimeRemaining] = useState(60);
+    const [timeRemaining, setTimeRemaining] = useState(5);
     const [resendDisabled, setResendDisabled] = useState(true);
 
     useEffect(() => {
@@ -57,6 +57,12 @@ const TwoFactorAuth = () => {
     };
 
     const handleKeyDown = (e, index) => {
+        if (e.key === "Enter") {
+            e.preventDefault(); // Prevent form submission
+            if (index < otp.length - 1 && otp[index] !== "") {
+                document.getElementById(`otp-input-${index + 1}`).focus();
+            }
+        }
         // Handle backspace
         if (e.key === "Backspace" && otp[index] === "") {
             if (e.target.previousSibling) {
@@ -74,7 +80,7 @@ const TwoFactorAuth = () => {
             console.log('resend_otp successful:', response.data);
             setMessage(response.data.message);
             setResendDisabled(true); // Disable the button
-            setTimeRemaining(60); // Reset the countdown timer
+            setTimeRemaining(5); // Reset the countdown timer
         } catch (error) {
             setMessage('Error resending OTP');
         }
@@ -89,20 +95,26 @@ const TwoFactorAuth = () => {
         const digits = pasteData.replace(/\D/g, ''); // Extract only digits
         const newOtp = [...otp];
 
+        let lastIndex = index;
+
         for (let i = 0; i < digits.length; i++) {
             if (index + i < newOtp.length) {
                 newOtp[index + i] = digits[i];
+                lastIndex = index + i; // Update lastIndex to the last digit position
             }
         }
 
         setOtp(newOtp);
 
-        // Move the focus to the next empty input field
-        const nextEmptyIndex = newOtp.findIndex(d => d === "");
-        if (nextEmptyIndex !== -1) {
-            document.getElementById(`otp-input-${nextEmptyIndex}`).focus();
+        // Move the focus to the last input field that was filled
+        if (lastIndex !== undefined) {
+            const lastInput = document.getElementById(`otp-input-${lastIndex}`);
+            if (lastInput) {
+                lastInput.focus();
+            }
         }
     };
+
 
     const handleVerifyOtp = async (e) => {
         e.preventDefault(); // Prevent form submission
@@ -160,12 +172,13 @@ const TwoFactorAuth = () => {
                     {otp.map((data, index) => (
                         <CodeInput
                             id={`otp-input-${index}`}
-                            type="text"
+                            type="tel"           // Use 'tel' for numeric keypad on mobile
+                            inputMode="numeric" // Ensure numeric keyboard on mobile
                             name="otp"
                             maxLength="1"
                             key={index}
                             value={data}
-                            onChange={e => handleChange(e, index)}
+                            onChange={e => handleChange(e.target, index)}
                             onFocus={e => e.target.select()}
                             onKeyDown={e => handleKeyDown(e, index)}
                             onPaste={e => handlePaste(e, index)}
