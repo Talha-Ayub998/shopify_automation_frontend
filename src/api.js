@@ -9,16 +9,14 @@ const api = axios.create({
 
 // Request interceptor to add token to headers
 api.interceptors.request.use((config) => {
-    // Retrieve token from local storage or any other secure storage mechanism
     const token = localStorage.getItem('authToken');
     if (token) {
         config.headers['Authorization'] = `Token ${token}`; // Use 'Token' for Django Knox
     }
 
-    // Retrieve CSRF token from cookies and add it to the request headers
-    const csrfToken = getCookie('csrftoken'); // Ensure you have a function to get the CSRF token
+    const csrfToken = getCookie('csrftoken');
     if (csrfToken) {
-        config.headers['X-CSRFToken'] = csrfToken; // Add CSRF token to headers
+        config.headers['X-CSRFToken'] = csrfToken;
     }
 
     return config;
@@ -30,7 +28,6 @@ api.interceptors.response.use(
     (error) => {
         if (error.response && error.response.status === 401) {
             localStorage.removeItem('authToken');
-            // Implement a more robust error handling mechanism (e.g., redirect to login)
             console.error('Unauthorized request:', error.response.data);
         }
         return Promise.reject(error);
@@ -53,4 +50,5 @@ function getCookie(name) {
     return cookieValue;
 }
 
+// Export the api instance
 export default api;
