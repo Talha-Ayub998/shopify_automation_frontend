@@ -97,6 +97,15 @@ const ChatPage = () => {
   }, [sessionId]);
 
 
+  const formatMessageText = (text) => {
+    return text.split('\n').map((part, index) => (
+      <React.Fragment key={index}>
+        {part}
+        {index < text.split('\n').length - 1 && <br />}
+      </React.Fragment>
+    ));
+  };
+
 
   useEffect(() => {
     if (bodyRef.current) {
@@ -211,7 +220,7 @@ const ChatPage = () => {
               isSender={msg.isSender}
               isSameSender={index > 0 && messages[index - 1].isSender === msg.isSender}
             >
-              {msg.text}
+              {formatMessageText(msg.text)}
             </Message>
           ))}
         </Body>
@@ -221,7 +230,13 @@ const ChatPage = () => {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder="Type your message..."
-            onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault(); // Prevent default Enter behavior (new line)
+                handleSendMessage();
+              }
+            }}
+            rows={4} // Adjust rows if you want to control height initially
           />
           <Button onClick={handleSendMessage}>Send</Button>
         </InputContainer>
@@ -229,6 +244,7 @@ const ChatPage = () => {
       <ToastContainer />
     </PageWrapper>
   );
+
 };
 
 export default ChatPage;
@@ -243,48 +259,7 @@ const Title = styled.div`
   margin: 0 0px 0 -55px /* Add some margin to create space between elements */
 `;
 
-// const LogoutButton = styled.button`
-//   padding: 8px 16px;
-//   border: none;
-//   border-radius: 5px;
-//   background-color: #444654;
-//   color: white;
-//   font-size: 16px;
-//   cursor: pointer;
-
-//   &:hover {
-//     background-color: #3a3b3d;
-//   }
-// `;
-
-// const DropdownMenu = styled.div`
-//   position: absolute;
-//   top: 50px; /* Adjust based on your layout */
-//   right: 0;
-//   background-color: #444654;
-//   color: #ffffff;
-//   border-radius: 5px;
-//   box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
-//   display: ${({ open }) => (open ? 'block' : 'none')};
-//   z-index: 1000;
-// `;
-
-// const LogoutButton = styled.button`
-//   background-color: #f00;
-//   color: #fff;
-//   border: none;
-//   border-radius: 5px;
-//   padding: 10px;
-//   cursor: pointer;
-//   &:hover {
-//     background-color: #c00;
-//   }
-// `;
-
-
-const Message = styled.div`
-${'' /* background-color: ${(props) => (props.isSender ? '#1a202c' : '#f5f5f5')};
-color: ${(props) => (props.isSender ? '#fff' : '#333')}; */}
+const Messagess = styled.div`
   margin-bottom: ${(props) => (props.isSameSender ? "5px" : "15px")};
   padding: 10px 20px;
   background-color: ${props => (props.isSender ? '#e7e7e8' : '#d2e3fc')};
@@ -326,7 +301,7 @@ color: ${(props) => (props.isSender ? '#fff' : '#333')}; */}
 `;
 
 
-const Input = styled.input`
+const Input = styled.textarea`
   flex: 1;
   padding: 10px;
   border: 1px solid #ddd;
@@ -334,6 +309,7 @@ const Input = styled.input`
   background-color: #f7f7f8;
   font-size: 16px;
   margin-right: 10px;
+  resize: none; /* Prevent resizing */
 `;
 
 const Button = styled.button`
@@ -359,18 +335,6 @@ const PageWrapper = styled.div`
   background-color: #e0e0e0; /* Light grey background */
 `;
 
-const ChatPageContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  height: 90vh;
-  width: 60%;
-  max-width: 800px;
-  margin: 20px auto;
-  background-color: #ffffff;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-`;
 
 const DropdownMenu = styled.div`
   position: absolute;
@@ -466,16 +430,6 @@ const Body = styled.div`
   background-color: #f7f7f8;
 `;
 
-const InputContainer = styled.div`
-  height: 60px;
-  display: flex;
-  align-items: center;
-  padding: 0 10px;
-  background-color: #ffffff;
-  border-top: 1px solid #ddd;
-  border-bottom-left-radius: 8px;
-  border-bottom-right-radius: 8px;
-`;
 
 const LoadingContainer = styled.div`
     display: flex;
@@ -488,4 +442,75 @@ const LoadingContainer = styled.div`
     left: 0;
     background-color: rgba(255, 255, 255, 0.8);
     z-index: 9999;
+`;
+
+const ChatPageContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  height: 90vh;
+  width: 100%;
+  max-width: 600px; /* Adjusted for smaller screens */
+  margin: 20px auto;
+  background-color: #ffffff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  @media (max-width: 768px) {
+    width: 95%; /* Make it more flexible on small screens */
+    height: 80vh;
+  }
+`;
+
+
+const Message = styled.div`
+${'' /* background-color: ${(props) => (props.isSender ? '#1a202c' : '#f5f5f5')};
+color: ${(props) => (props.isSender ? '#fff' : '#333')}; */}
+  margin-bottom: ${(props) => (props.isSameSender ? "5px" : "15px")};
+  padding: 10px 20px;
+  background-color: ${props => (props.isSender ? '#e7e7e8' : '#d2e3fc')};
+  border: 1px solid ${props => (props.isSender ? '#ccc' : '#aaa')};
+  border-radius: 5px;
+  max-width: 90%; /* Adjust for smaller screens */
+  word-wrap: break-word;
+  align-self: ${(props) => (props.isSender ? "flex-end" : "flex-start")};
+  border-radius: ${(props) => (props.isSender ? "20px 20px 0 20px" : "20px 20px 20px 0")};
+  float: ${props => (props.isSender ? 'right' : 'left')};
+  clear: both;
+  margin: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.5;
+  text-align: ${props => (props.isSender ? 'right' : 'left')};
+  animation: ${props => (props.isSender ? 'fadeInRight' : 'fadeInLeft')} 0.5s ease-in-out;
+  @keyframes fadeInRight {
+    0% {
+      opacity: 0;
+      transform: translateX(20px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+  @keyframes fadeInLeft {
+    0% {
+      opacity: 0;
+      transform: translateX(-20px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+`;
+
+
+const InputContainer = styled.div`
+  display: flex;
+  align-items: center;
+  margin: 0 16px; /* Adjust margins if needed */
+  @media (max-width: 768px) {
+    height: auto; /* Make it adjust based on content */
+  }
 `;
