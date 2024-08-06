@@ -27,7 +27,7 @@ const defaultTheme = createTheme();
 export default function SignIn() {
 
     const navigate = useNavigate();
-    const { login } = useAuth();
+    const { login, passwordResetSuccess, setpasswordResetSuccess } = useAuth();
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
@@ -35,6 +35,22 @@ export default function SignIn() {
         if (authToken) navigate('/chatpage');
 
     }, []);
+
+
+    useEffect(() => {
+        if (passwordResetSuccess) {
+            toast.success('A new password has been sent to your email address.', {
+                position: 'top-right',
+                autoClose: 2000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+            });
+        }
+        setpasswordResetSuccess(false); // Reset login success flag
+    }, [passwordResetSuccess, setpasswordResetSuccess]);
 
     const handleNavigate = (event) => {
         event.preventDefault();

@@ -1,10 +1,18 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
+import api from './api';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { Oval } from 'react-loader-spinner';
+import { useAuth } from './AuthContext';
 
 const ForgotPassword = () => {
     const [email, setEmail] = useState('');
     const [error, setError] = useState('');
+    const [loading, setLoading] = useState(false);
+    const { setpasswordResetSuccess } = useAuth();
+
     const navigate = useNavigate();
 
     // Handle email change
@@ -14,31 +22,55 @@ const ForgotPassword = () => {
 
     // Handle password reset request
     const handleRequestReset = async () => {
+        if (!email) {
+            toast.error('Email field are required.', {
+                position: 'top-right',
+                autoClose: 3000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+            });
+            return;
+        }
         setError('');
+        setLoading(true); // Assuming you have a loading state
 
         try {
-            // Replace with your password reset request API endpoint and method
-            const response = await fetch('/api/request-password-reset', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    email,
-                }),
+            const response = await api.post('auth/users/request-password-reset/', {
+                email,
             });
 
-            const data = await response.json();
-
-            if (response.ok) {
-                // Handle success (e.g., show success message)
+            if (response.status === 200) {
+                setpasswordResetSuccess(true);
                 console.log('Password reset request successful');
+                navigate('/signin')
                 // Redirect or show success message
             } else {
-                setError(data.message || 'An error occurred');
+                setError(response.data.detail || 'An error occurred');
             }
         } catch (error) {
-            setError('An error occurred');
+            console.log(error.response?.data || error);
+            let errorMsg = error.message || 'An error occurred'; // Default message
+            if (error.response && error.response.data) {
+                // Extract detailed error messages if available
+                errorMsg = Object.values(error.response.data).flat().join(', ');
+            } else if (error.response) {
+                // Fallback message if response data is empty
+                errorMsg = error.response.statusText || 'An error occurred';
+            }
+            toast.error(errorMsg, {
+                position: 'top-right',
+                autoClose: 3000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+            });
+        } finally {
+            setLoading(false); // Ensure loading is set to false in all cases
         }
     };
 
@@ -51,22 +83,39 @@ const ForgotPassword = () => {
     };
 
     return (
-        <Container>
-            <MailIcon>🔒</MailIcon>
-            <Title>Forgot Your Password?</Title>
-            <Description>
-                Enter your email address below to request a password reset link.
-            </Description>
-            <Input
-                type="email"
-                placeholder="Enter your email"
-                value={email}
-                onChange={e => handleChange(e.target.value)}
-            />
-            {error && <Error>{error}</Error>}
-            <SubmitButton onClick={handleRequestReset}>Reset password</SubmitButton>
-            <BackButton onClick={handleBack}>Back</BackButton>
-        </Container>
+        <>
+            {loading && (
+                <LoadingContainer>
+                    <Oval
+                        height={100}
+                        width={100}
+                        color="#4fa94d"
+                        visible={true}
+                        ariaLabel='oval-loading'
+                        secondaryColor="#4fa94d"
+                        strokeWidth={2}
+                        strokeWidthSecondary={2}
+                    />
+                </LoadingContainer>
+            )}
+            <Container>
+                <MailIcon>🔒</MailIcon>
+                <Title>Forgot Your Password?</Title>
+                <Description>
+                    Enter your email address below to request a password reset link.
+                </Description>
+                <Input
+                    type="email"
+                    placeholder="Enter your email"
+                    value={email}
+                    onChange={e => handleChange(e.target.value)}
+                />
+                {error && <Error>{error}</Error>}
+                <SubmitButton onClick={handleRequestReset}>Reset password</SubmitButton>
+                <BackButton onClick={handleBack}>Back</BackButton>
+            </Container>
+            <ToastContainer />
+        </>
     );
 };
 
@@ -133,4 +182,17 @@ const BackButton = styled.button`
     color: #007bff;
     cursor: pointer;
     font-size: 16px;
+`;
+
+const LoadingContainer = styled.div`
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    width: 100vw;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background-color: rgba(255, 255, 255, 0.8);
+    z-index: 9999;
 `;

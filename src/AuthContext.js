@@ -23,6 +23,7 @@ export const AuthProvider = ({ children }) => {
     const [isLoading, setIsLoading] = useState(true);
     const [isLoggingOut, setIsLoggingOut] = useState(false); // New state for logging out
     const [loginSuccess, setLoginSuccess] = useState(false);
+    const [passwordResetSuccess, setpasswordResetSuccess] = useState(false);
     const [isSignupComplete, setIsSignupComplete] = useState(false);
     const [passwordChanges, setPasswordChanges] = useState(false);
     const navigate = useNavigate();
@@ -77,7 +78,7 @@ export const AuthProvider = ({ children }) => {
     }
 
     return (
-        <AuthContext.Provider value={{ isAuthenticated, login, logout, loginSuccess, setLoginSuccess, isSignupComplete, setIsSignupComplete, passwordChanges, setPasswordChanges }}>
+        <AuthContext.Provider value={{ isAuthenticated, login, logout, loginSuccess, setLoginSuccess, isSignupComplete, setIsSignupComplete, passwordChanges, setPasswordChanges, passwordResetSuccess, setpasswordResetSuccess }}>
             {children}
         </AuthContext.Provider>
     );
