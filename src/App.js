@@ -1,5 +1,6 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import SignIn from './SignIn';
 import SignUp from './SignUp';
 import ChatPage from './ChatPage';
@@ -22,7 +23,7 @@ const App = () => {
           <Route path="/landingpage" element={<LandingPage />} />
           <Route path="/resetpassword" element={<ProtectedRoute element={<ResetPassword />} />} />
           <Route path="/forgetpassword" element={<ForgotPassword />} />
-          <Route path="/" element={<LandingPage />} /> {/* Default to SignIn */}
+          <Route path="/" element={<RedirectToExternal url="http://35.226.248.205/home/" />} /> {/* Redirect '/' to external URL */}
           <Route path="/chatpage" element={<ProtectedRoute element={<ChatPage />} />} />
           <Route path="*" element={<NotFound />} /> {/* 404 Not Found */}
         </Routes>
@@ -32,3 +33,11 @@ const App = () => {
 };
 
 export default App;
+
+const RedirectToExternal = ({ url }) => {
+  useEffect(() => {
+    window.location.href = url;
+  }, [url]);
+
+  return null; // or you can return a loading spinner or message
+};
