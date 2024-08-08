@@ -246,7 +246,7 @@ function Copyright(props) {
     return (
         <Typography variant="body2" color="text.secondary" align="center" {...props}>
             {'Copyright © '}
-            <Link color="inherit" href="/landingpage">
+            <Link color="inherit" href="http://35.226.248.205/home/">
                 Your Website
             </Link>{' '}
             {new Date().getFullYear()}
