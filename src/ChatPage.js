@@ -21,6 +21,8 @@ const ChatPage = () => {
   const userEmail = localStorage.getItem('userEmail');
   const [loading, setLoading] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [isTyping, setIsTyping] = useState(false);
+  const [typingDots, setTypingDots] = useState('');
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -83,7 +85,8 @@ const ChatPage = () => {
         const response = await api.get(`chat/history/${sessionId}/`);
         const fetchedMessages = response.data.messages.map(msg => ({
           text: msg.message,
-          isSender: msg.is_sender,
+          graph: msg.graph || null,
+          isSender: msg.is_sender
         }));
         setMessages(fetchedMessages);
       } catch (error) {
@@ -113,47 +116,74 @@ const ChatPage = () => {
     }
   }, [messages]);
 
+  useEffect(() => {
+    let interval;
+    if (isTyping) {
+      interval = setInterval(() => {
+        setTypingDots(prev => (prev.length < 3 ? prev + '.' : ''));
+      }, 500);  // Adjust the timing for the dots animation
+    } else {
+      setTypingDots('');
+    }
+    return () => clearInterval(interval);
+  }, [isTyping]);
+
   const handleSendMessage = async () => {
     if (input.trim() === '') return;
 
     const userMessage = { text: input, isSender: true };
     setMessages(prevMessages => [...prevMessages, userMessage]);
+    setIsTyping(true);
+    setInput(''); // Clear the input field immediately
 
     try {
-      // Get the bot's response from ChatGPT
-      const response = await axios.post('https://api.openai.com/v1/chat/completions', {
-        model: 'gpt-3.5-turbo',
-        messages: [{ role: 'user', content: input }],
-      }, {
-        headers: {
-          'Authorization': `Bearer sk-proj-Fd3OKuZlEcgY1SUyftdaT3BlbkFJFy0GIKaqkt13c3pbMXLe`,
-          'Content-Type': 'application/json',
-        },
+      // Make a POST request to your Django API using the api instance
+      const response = await api.post('chat/chatbot/', {
+        user_id: userId, // Ensure userId is defined and correct
+        prompt: input,
       });
+      // Extract the bot's response and graph (if any)
+      const { description, graph } = response.data;
+      const botMessage = { text: description, isSender: false };
 
-      const botMessage = { text: response.data.choices[0].message.content, isSender: false };
+      // Update the messages state with the bot's text response
       setMessages(prevMessages => [...prevMessages, botMessage]);
 
-      // Save the chat messages to Django backend using the api instance
+      // If there is a graph, add it to the messages
+      if (graph) {
+        const graphMessage = { graph, isSender: false };
+        setMessages(prevMessages => [...prevMessages, graphMessage]);
+      }
+
+      // Save the user message to Django backend
       await api.post('chat/messages/', {
-        user_id: userId,
         message_text: input,
         session_id: sessionId, // Pass the session ID if using session-based chat
         is_sender: true, // Indicate that the message is from the user
       });
 
+      // Save the bot's text response to Django backend
       await api.post('chat/messages/', {
-        user_id: userId,
-        message_text: botMessage.text,
+        message_text: description,
         session_id: sessionId, // Pass the session ID if using session-based chat
         is_sender: false, // Indicate that the message is from the bot
       });
 
-    } catch (error) {
-      console.error('Error fetching response from ChatGPT or saving to Django:', error);
-    }
+      // Save the bot's graph (if any) to Django backend
+      if (graph) {
+        await api.post('chat/messages/', {
+          graph: graph,  // Pass the graph data
+          session_id: sessionId, // Pass the session ID if using session-based chat
+          is_sender: false, // Indicate that the message is from the bot (graph)
+        });
+      }
 
-    setInput('');
+    } catch (error) {
+      console.error('Error fetching response from the API or saving to Django:', error);
+    } finally {
+      // Remove the bot typing indicator
+      setIsTyping(false);
+    }
   };
 
 
@@ -220,11 +250,23 @@ const ChatPage = () => {
               isSender={msg.isSender}
               isSameSender={index > 0 && messages[index - 1].isSender === msg.isSender}
             >
-              <MessageText isSender={msg.isSender}>
-                {formatMessageText(msg.text)}
-              </MessageText>
+              {msg.text && (
+                <MessageText isSender={msg.isSender}>
+                  {formatMessageText(msg.text)}
+                </MessageText>
+              )}
+              {msg.graph && (
+                <img src={`data:image/png;base64,${msg.graph}`} alt="Graph" style={{ width: '100%', maxHeight: '500px', objectFit: 'contain' }} />
+              )}
             </Message>
           ))}
+          {isTyping && (
+            <Message isSender={false}>
+              <MessageText isSender={false}>
+                {typingDots || '...'}
+              </MessageText>
+            </Message>
+          )}
         </Body>
         <InputContainer>
           <Textarea
@@ -238,6 +280,7 @@ const ChatPage = () => {
               }
             }}
             rows={4} // Adjust rows to control height
+            disabled={isTyping}
           />
           <Button onClick={handleSendMessage}>Send</Button>
         </InputContainer>
@@ -255,7 +298,7 @@ const MessageText = styled.div`
 `;
 
 const Logo = styled.img`
-  height: 75px;
+  height: 150px;
   margin: 8px 0 0 0rem;
 `;
 
@@ -393,7 +436,7 @@ const ChatPageContainer = styled.div`
   flex-direction: column;
   height: 90vh;
   width: 100%;
-  max-width: 600px; /* Adjusted for smaller screens */
+  max-width: 1000px; /* Adjusted for smaller screens */
   margin: 20px auto;
   background-color: #ffffff;
   border: 1px solid #ddd;
@@ -453,7 +496,7 @@ color: ${(props) => (props.isSender ? '#fff' : '#333')}; */}
 const InputContainer = styled.div`
   display: flex;
   align-items: center;
-  margin: 0 16px; /* Adjust margins if needed */
+  margin: 16px 16px; /* Adjust margins if needed */
   @media (max-width: 768px) {
     height: auto; /* Make it adjust based on content */
   }
