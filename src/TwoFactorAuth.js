@@ -77,7 +77,6 @@ const TwoFactorAuth = () => {
             const response = await api.post('auth/users/resend_otp/', { user_id });
             setError('')
             setOtp(new Array(6).fill(""));
-            console.log('resend_otp successful:', response.data);
             setMessage(response.data.message);
             setResendDisabled(true); // Disable the button
             setTimeRemaining(5); // Reset the countdown timer

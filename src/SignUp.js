@@ -89,7 +89,9 @@ export default function SignUp() {
             setIsSignupComplete(true);
             localStorage.setItem('userId', response.data.user_id);
             localStorage.setItem('userEmail', response.data.user_email);
-            console.log('Sign up successful:', response.data);
+            localStorage.removeItem('signup_name');
+            localStorage.removeItem('signup_email');
+            localStorage.removeItem('signup_number');
         } catch (error) {
             console.error('Sign up error:', error.response?.data);
             let errorMessage = 'An error occurred';

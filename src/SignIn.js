@@ -86,7 +86,6 @@ export default function SignIn() {
         try {
             // Send login request
             const response = await api.post('auth/users/login/', { email, password });
-            console.log('Sign in successful:', response.data);
             const { token } = response.data;
 
             // Store token in local storage
