@@ -34,7 +34,7 @@ export default function SignUp() {
     useEffect(() => {
         const storedUsername = localStorage.getItem('signup_name');
         const storedEmail = localStorage.getItem('signup_email');
-        const storedPhoneNumber = localStorage.getItem('phoneNumber');
+        const storedPhoneNumber = localStorage.getItem('signup_number');
 
         if (storedUsername) setUsername(storedUsername);
         if (storedEmail) setEmail(storedEmail);
