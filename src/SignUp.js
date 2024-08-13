@@ -81,7 +81,7 @@ export default function SignUp() {
                 username,
                 email,
                 password,
-                phoneNumber, // Corrected variable name
+                phone_number: phoneNumber, // Corrected variable name
                 shopify_store_url: shopifyStoreUrl,
                 shopify_access_token: shopifyAccessToken,
             });
