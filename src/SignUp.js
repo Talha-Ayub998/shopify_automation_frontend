@@ -27,6 +27,19 @@ export default function SignUp() {
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
     const { setIsSignupComplete } = useAuth();
+    const [username, setUsername] = useState('');
+    const [email, setEmail] = useState('');
+    const [phoneNumber, setPhoneNumber] = useState('');
+
+    useEffect(() => {
+        const storedUsername = localStorage.getItem('signup_name');
+        const storedEmail = localStorage.getItem('signup_email');
+        const storedPhoneNumber = localStorage.getItem('phoneNumber');
+
+        if (storedUsername) setUsername(storedUsername);
+        if (storedEmail) setEmail(storedEmail);
+        if (storedPhoneNumber) setPhoneNumber(storedPhoneNumber);
+    }, []);
 
     useEffect(() => {
         if (mfaEnabled) {
@@ -46,11 +59,11 @@ export default function SignUp() {
         const username = data.get('username');
         const email = data.get('email');
         const password = data.get('password');
+        const phoneNumber = data.get('phoneNumber'); // Corrected variable name
         const shopifyStoreUrl = data.get('shopifyUrl');
         const shopifyAccessToken = data.get('accessToken');
 
-        // Check if any of the required fields are empty
-        if (!username || !email || !password || !shopifyStoreUrl || !shopifyAccessToken) {
+        if (!username || !email || !password || !shopifyStoreUrl || !shopifyAccessToken || !phoneNumber) {
             toast.error('All fields are required.', {
                 position: 'top-right',
                 autoClose: 3000,
@@ -63,41 +76,33 @@ export default function SignUp() {
             return;
         }
         try {
-            // Send the registration request
             setLoading(true);
             const response = await api.post('auth/users/register/', {
                 username,
                 email,
                 password,
+                phoneNumber, // Corrected variable name
                 shopify_store_url: shopifyStoreUrl,
                 shopify_access_token: shopifyAccessToken,
             });
-            // console.log('Sign up successful:', response.data);
             setMfaEnabled(true);
             setIsSignupComplete(true);
-            console.log('Sign up successful:', response.data);
             localStorage.setItem('userId', response.data.user_id);
             localStorage.setItem('userEmail', response.data.user_email);
+            console.log('Sign up successful:', response.data);
         } catch (error) {
             console.error('Sign up error:', error.response?.data);
-
-            // Handle sign-up error with a user-friendly toast
-            let errorMessage = 'An error occurred'; // Default message
-
+            let errorMessage = 'An error occurred';
             if (error.response && error.response.data) {
                 if (Array.isArray(error.response.data.non_field_errors) && error.response.data.non_field_errors.length > 0) {
                     errorMessage = error.response.data.non_field_errors.join(', ');
                 } else if (error.response.data.error) {
                     errorMessage = error.response.data.error;
                 } else if (error.response.data.shopify_store_url) {
-                    errorMessage = error.response.data.shopify_store_url[0]; // Specific error for shopify_store_url
+                    errorMessage = error.response.data.shopify_store_url[0];
                 }
             }
-
-            // Ensure errorMessage is a string before passing to toast.error
-            const errorMsg = typeof errorMessage === 'string' ? errorMessage : errorMessage.toString();
-
-            toast.error(errorMsg, {
+            toast.error(errorMessage, {
                 position: 'top-right',
                 autoClose: 3000,
                 hideProgressBar: false,
@@ -106,8 +111,7 @@ export default function SignUp() {
                 draggable: true,
                 progress: undefined,
             });
-        }
-        finally {
+        } finally {
             setLoading(false);
         }
     };
@@ -158,6 +162,8 @@ export default function SignUp() {
                                         id="username"
                                         label="Username"
                                         autoFocus
+                                        value={username}
+                                        onChange={(e) => setUsername(e.target.value)}
                                     />
                                 </Grid>
                                 <Grid item xs={12}>
@@ -168,6 +174,20 @@ export default function SignUp() {
                                         label="Email Address"
                                         name="email"
                                         autoComplete="email"
+                                        value={email}
+                                        onChange={(e) => setEmail(e.target.value)}
+                                    />
+                                </Grid>
+                                <Grid item xs={12}>
+                                    <TextField
+                                        required
+                                        fullWidth
+                                        id="phonenumber"
+                                        label="Phone Number"
+                                        name="phoneNumber"
+                                        autoComplete="tel"
+                                        value={phoneNumber}
+                                        onChange={(e) => setPhoneNumber(e.target.value)}
                                     />
                                 </Grid>
                                 <Grid item xs={12}>
