@@ -22,7 +22,11 @@ import signInSideBg from './Ecomaitech.com.png' // Make sure the path is correct
 import styled from 'styled-components';
 
 // TODO remove, this demo shouldn't need to reset the theme.
-const defaultTheme = createTheme();
+const defaultTheme = createTheme({
+  typography: {
+    fontFamily: 'Inter, Arial, sans-serif',
+  },
+});
 
 export default function SignIn() {
 

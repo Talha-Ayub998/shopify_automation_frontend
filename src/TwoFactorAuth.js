@@ -217,6 +217,7 @@ const LoadingContainer = styled.div`
     left: 0;
     background-color: rgba(255, 255, 255, 0.8);
     z-index: 9999;
+    font-family: 'Inter', Arial, sans-serif;
 `;
 
 
@@ -229,26 +230,31 @@ const Container = styled.div`
     max-width: 400px;
     margin: 0 auto;
     margin-top: 100px;
+    font-family: 'Inter', Arial, sans-serif;
 `;
 
 const MailIcon = styled.div`
     font-size: 40px;
     margin-bottom: 20px;
+    font-family: 'Inter', Arial, sans-serif;
 `;
 
 const Title = styled.h2`
     margin: 0;
     font-size: 24px;
+    font-family: 'Inter', Arial, sans-serif;
 `;
 
 const Description = styled.p`
     margin: 10px 0 20px;
+    font-family: 'Inter', Arial, sans-serif;
 `;
 
 const CodeInputs = styled.div`
     display: flex;
     justify-content: center;
     margin-bottom: 20px;
+    font-family: 'Inter', Arial, sans-serif;
 `;
 
 const CodeInput = styled.input`
@@ -259,11 +265,13 @@ const CodeInput = styled.input`
     font-size: 20px;
     border: 1px solid #ddd;
     border-radius: 5px;
+    font-family: 'Inter', Arial, sans-serif;
 `;
 
 const Error = styled.div`
     color: red;
     margin-bottom: 20px;
+    font-family: 'Inter', Arial, sans-serif;
 `;
 
 const VerifyButton = styled.button`
@@ -277,16 +285,19 @@ const VerifyButton = styled.button`
     border: none;
     border-radius: 5px;
     cursor: pointer;
+    font-family: 'Inter', Arial, sans-serif;
 `;
 
 const Resend = styled.div`
     margin: 20px 0;
+    font-family: 'Inter', Arial, sans-serif;
 `;
 
 const ResendLink = styled.a`
     color: #007bff;
     text-decoration: none;
     margin-left: 5px;
+    font-family: 'Inter', Arial, sans-serif;
 `;
 
 const BackButton = styled.button`
@@ -295,4 +306,5 @@ const BackButton = styled.button`
     color: #007bff;
     cursor: pointer;
     font-size: 16px;
+    font-family: 'Inter', Arial, sans-serif;
 `;

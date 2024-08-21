@@ -20,7 +20,11 @@ import { Oval } from 'react-loader-spinner';
 import styled from 'styled-components';
 import { useAuth } from './AuthContext';
 
-const theme = createTheme();
+const theme = createTheme({
+    typography: {
+        fontFamily: 'Inter, Arial, sans-serif',
+    },
+});
 
 export default function SignUp() {
     const [mfaEnabled, setMfaEnabled] = useState(false);

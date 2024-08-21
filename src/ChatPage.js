@@ -295,11 +295,13 @@ export default ChatPage;
 
 const MessageText = styled.div`
   text-align: left
+  font-family: 'Inter', Arial, sans-serif;
 `;
 
 const Logo = styled.img`
   height: 150px;
   margin: 8px 0 0 0rem;
+  font-family: 'Inter', Arial, sans-serif;
 `;
 
 const Textarea = styled.textarea`
@@ -311,6 +313,7 @@ const Textarea = styled.textarea`
   font-size: 16px;
   margin-right: 10px;
   resize: none; /* Prevent resizing */
+  font-family: 'Inter', Arial, sans-serif;
 `;
 
 const Button = styled.button`
@@ -321,6 +324,7 @@ const Button = styled.button`
   color: white;
   font-size: 16px;
   cursor: pointer;
+  font-family: 'Inter', Arial, sans-serif;
 
   &:hover {
     background-color: #3a3b3d;
@@ -334,6 +338,7 @@ const PageWrapper = styled.div`
   height: 100vh;
   width: 100%;
   background-color: #e0e0e0; /* Light grey background */
+  font-family: 'Inter', Arial, sans-serif;
 `;
 
 
@@ -349,6 +354,7 @@ const DropdownMenu = styled.div`
   padding: 10px;
   z-index: 1000;
   min-width: 200px;
+  font-family: 'Inter', Arial, sans-serif;
 `;
 
 const MenuItem = styled.div`
@@ -357,6 +363,7 @@ const MenuItem = styled.div`
   padding: 10px;
   color: #ffffff;
   cursor: pointer;
+  font-family: 'Inter', Arial, sans-serif;
 
   &:hover {
     background-color: #555555;
@@ -365,6 +372,7 @@ const MenuItem = styled.div`
 
 const Icon = styled.div`
   margin-right: 10px;
+  font-family: 'Inter', Arial, sans-serif;
 `;
 
 const Header = styled.div`
@@ -381,6 +389,7 @@ const Header = styled.div`
   border-top-right-radius: 8px;
   border-bottom: 1px solid #444;
   justify-content: space-between;
+  font-family: 'Inter', Arial, sans-serif;
 `;
 
 const HeaderContent = styled.div`
@@ -389,6 +398,7 @@ const HeaderContent = styled.div`
   width: 100%;
   justify-content: space-between; /* This will distribute the elements evenly */
   padding: 0 20px; /* Add some padding to create space between elements */
+  font-family: 'Inter', Arial, sans-serif;
 `;
 
 const UserEmail = styled.span`
@@ -404,6 +414,7 @@ const UserEmail = styled.span`
   display: flex;
   align-items: center;
   justify-content: center;
+  font-family: 'Inter', Arial, sans-serif;
 
   &:hover {
     background-color: #777;
@@ -415,6 +426,7 @@ const Body = styled.div`
   padding: 10px;
   overflow-y: scroll;
   background-color: #f7f7f8;
+  font-family: 'Inter', Arial, sans-serif;
 `;
 
 
@@ -429,6 +441,7 @@ const LoadingContainer = styled.div`
     left: 0;
     background-color: rgba(255, 255, 255, 0.8);
     z-index: 9999;
+    font-family: 'Inter', Arial, sans-serif;
 `;
 
 const ChatPageContainer = styled.div`
@@ -442,6 +455,7 @@ const ChatPageContainer = styled.div`
   border: 1px solid #ddd;
   border-radius: 8px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  font-family: 'Inter', Arial, sans-serif;
   @media (max-width: 768px) {
     width: 95%; /* Make it more flexible on small screens */
     height: 80vh;
@@ -470,6 +484,7 @@ color: ${(props) => (props.isSender ? '#fff' : '#333')}; */}
   line-height: 1.5;
   text-align: ${props => (props.isSender ? 'right' : 'left')};
   animation: ${props => (props.isSender ? 'fadeInRight' : 'fadeInLeft')} 0.5s ease-in-out;
+  font-family: 'Inter', Arial, sans-serif;
   @keyframes fadeInRight {
     0% {
       opacity: 0;
@@ -497,6 +512,7 @@ const InputContainer = styled.div`
   display: flex;
   align-items: center;
   margin: 16px 16px; /* Adjust margins if needed */
+  font-family: 'Inter', Arial, sans-serif;
   @media (max-width: 768px) {
     height: auto; /* Make it adjust based on content */
   }
