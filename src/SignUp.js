@@ -26,6 +26,9 @@ const theme = createTheme({
     },
 });
 
+const BASE_URL = process.env.REACT_APP_API_URL;
+const homeUrl = `${BASE_URL}/home/`;
+
 export default function SignUp() {
     const [mfaEnabled, setMfaEnabled] = useState(false);
     const [loading, setLoading] = useState(false);
@@ -272,7 +275,7 @@ function Copyright(props) {
     return (
         <Typography variant="body2" color="text.secondary" align="center" {...props}>
             {'Copyright © '}
-            <Link color="inherit" href="http://35.226.248.205/home/">
+            <Link color="inherit" href={homeUrl}>
                 Your Website
             </Link>{' '}
             {new Date().getFullYear()}
