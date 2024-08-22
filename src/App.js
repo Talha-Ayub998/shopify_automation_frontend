@@ -23,7 +23,7 @@ const App = () => {
           <Route path="/landingpage" element={<LandingPage />} />
           <Route path="/resetpassword" element={<ProtectedRoute element={<ResetPassword />} />} />
           <Route path="/forgetpassword" element={<ForgotPassword />} />
-          <Route path="/" element={<RedirectToExternal url="http://35.226.248.205/home/" />} /> {/* Redirect '/' to external URL */}
+          <Route path="/" element={<RedirectToExternal url="https://ecomaitech.com/home/" />} /> {/* Redirect '/' to external URL */}
           <Route path="/chatpage" element={<ProtectedRoute element={<ChatPage />} />} />
           <Route path="*" element={<NotFound />} /> {/* 404 Not Found */}
         </Routes>
