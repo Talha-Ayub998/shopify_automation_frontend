@@ -98,17 +98,34 @@ export default function SignUp() {
             localStorage.removeItem('signup_number');
         } catch (error) {
             console.error('Sign up error:', error.response?.data);
+
             let errorMessage = 'An error occurred';
+
             if (error.response && error.response.data) {
-                if (Array.isArray(error.response.data.non_field_errors) && error.response.data.non_field_errors.length > 0) {
-                    errorMessage = error.response.data.non_field_errors.join(', ');
-                } else if (error.response.data.error) {
-                    errorMessage = error.response.data.error;
-                } else if (error.response.data.shopify_store_url) {
-                    errorMessage = error.response.data.shopify_store_url[0];
+                const errorData = error.response.data;
+
+                // Check if errorData.error is a string and process it
+                if (typeof errorData.error === 'string') {
+                    // Regular expression to extract key-value pairs
+                    const regex = /'([^']+)': \[ErrorDetail\(string='([^']+)', code='[^']+'\)\]/g;
+                    let match;
+                    let parsedErrors = [];
+
+                    // Find all matches in the error string
+                    while ((match = regex.exec(errorData.error)) !== null) {
+                        parsedErrors.push(`${match[1]}: ${match[2]}`);
+                    }
+
+                    // Join all parsed errors into a single string with HTML line breaks
+                    errorMessage = parsedErrors.join('<br/>');
+                } else if (Array.isArray(errorData.non_field_errors) && errorData.non_field_errors.length > 0) {
+                    errorMessage = errorData.non_field_errors.join('<br/>');
+                } else if (errorData.shopify_store_url) {
+                    errorMessage = errorData.shopify_store_url[0];
                 }
             }
-            toast.error(errorMessage, {
+
+            toast.error(<div dangerouslySetInnerHTML={{ __html: errorMessage }} />, {
                 position: 'top-right',
                 autoClose: 3000,
                 hideProgressBar: false,
