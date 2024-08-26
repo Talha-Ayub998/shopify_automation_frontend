@@ -103,14 +103,30 @@ export default function SignIn() {
             // Redirect to the chat page
             navigate('/chatpage');
         } catch (error) {
-            // Extract specific error message from the response if available
+            // Initialize default error message
             let errorMessage = 'An error occurred. Please try again.';
+
             if (error.response && error.response.data) {
-                // Check if non_field_errors is an array and has at least one element
-                if (Array.isArray(error.response.data.non_field_errors) && error.response.data.non_field_errors.length > 0) {
-                    errorMessage = error.response.data.non_field_errors[0];
+                const errorData = error.response.data;
+                let errorMessages = [];
+
+                // Handle non_field_errors specifically
+                if (errorData.non_field_errors) {
+                    errorMessages = errorData.non_field_errors; // Only take the message(s)
                 } else {
-                    errorMessage = error.response.data.error || errorMessage;
+                    // Collect other error messages
+                    for (const [key, value] of Object.entries(errorData)) {
+                        if (Array.isArray(value)) {
+                            errorMessages.push(...value); // Flatten the array of messages
+                        } else {
+                            errorMessages.push(value); // Add the value if it's not an array
+                        }
+                    }
+                }
+
+                // Use the first message from the array as the error message
+                if (errorMessages.length > 0) {
+                    errorMessage = errorMessages.join(', '); // Join multiple messages if needed
                 }
             }
 
@@ -119,16 +135,21 @@ export default function SignIn() {
             // Ensure errorMessage is a string before passing to toast.error
             const errorMsg = typeof errorMessage === 'string' ? errorMessage : errorMessage.toString();
 
-            toast.error(errorMsg, {
-                position: 'top-right',
-                autoClose: 3000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-            });
+            toast.error(
+                errorMsg, // Directly pass the error message
+                {
+                    position: 'top-right',
+                    autoClose: 3000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                }
+            );
         }
+
+
     };
 
     return (
