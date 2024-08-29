@@ -1049,7 +1049,6 @@
                     <div class="lg:ms-5">
                         <div class="bg-white dark:bg-slate-900 rounded-md shadow dark:shadow-gray-700 p-6">
                             <form method="post" name="myForm" id="myForm" action="https://ecomaitech.com/api/auth/users/send-email/">
-                                {% csrf_token %}
                                 <p class="mb-0" id="error-msg"></p>
                                 <div id="simple-msg"></div>
                                 <div class="grid lg:grid-cols-12 grid-cols-1 gap-3">
@@ -1166,6 +1165,35 @@
     <script src="assets/libs/tiny-slider/min/tiny-slider.js"></script>
     <script src="assets/js/plugins.init.js"></script>
     <script src="assets/js/app.js"></script>
+    <script>
+        // JavaScript function to get the CSRF token from the cookie
+        function getCSRFToken() {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    // Check if the cookie string begins with "csrftoken="
+                    if (cookie.substring(0, 10) === ('csrftoken=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(10));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        // Add the CSRF token to the form dynamically
+        document.addEventListener("DOMContentLoaded", function () {
+            const csrfToken = getCSRFToken();
+            const form = document.getElementById("myForm");
+            const csrfInput = document.createElement("input");
+            csrfInput.setAttribute("type", "hidden");
+            csrfInput.setAttribute("name", "csrfmiddlewaretoken");
+            csrfInput.setAttribute("value", csrfToken);
+            form.appendChild(csrfInput);
+        });
+    </script>
     <!-- JAVASCRIPTS -->
     <script>
         function toggleAccordion(button) {
