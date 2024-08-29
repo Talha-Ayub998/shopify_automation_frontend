@@ -147,6 +147,12 @@ export default function SignIn() {
                     progress: undefined,
                 }
             );
+            if (error.response && error.response.status === 403) {
+                // Redirect to the pricing page after 5 seconds
+                setTimeout(() => {
+                    window.location.href = 'https://ecomaitech.com/home/#pricing';
+                }, 2500);
+            }
         }
 
 
