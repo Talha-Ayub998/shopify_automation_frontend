@@ -1165,35 +1165,64 @@
     <script src="assets/libs/tiny-slider/min/tiny-slider.js"></script>
     <script src="assets/js/plugins.init.js"></script>
     <script src="assets/js/app.js"></script>
-    <script>
-        // JavaScript function to get the CSRF token from the cookie
-        function getCSRFToken() {
-            let cookieValue = null;
-            if (document.cookie && document.cookie !== '') {
-                const cookies = document.cookie.split(';');
-                for (let i = 0; i < cookies.length; i++) {
-                    const cookie = cookies[i].trim();
-                    // Check if the cookie string begins with "csrftoken="
-                    if (cookie.substring(0, 10) === ('csrftoken=')) {
-                        cookieValue = decodeURIComponent(cookie.substring(10));
-                        break;
+        <script>
+            function getCSRFToken() {
+                let cookieValue = null;
+                if (document.cookie && document.cookie !== '') {
+                    const cookies = document.cookie.split(';');
+                    for (let i = 0; i < cookies.length; i++) {
+                        const cookie = cookies[i].trim();
+                        if (cookie.substring(0, 10) === ('csrftoken=')) {
+                            cookieValue = decodeURIComponent(cookie.substring(10));
+                            break;
+                        }
                     }
                 }
+                return cookieValue;
             }
-            return cookieValue;
-        }
 
-        // Add the CSRF token to the form dynamically
-        document.addEventListener("DOMContentLoaded", function () {
-            const csrfToken = getCSRFToken();
-            const form = document.getElementById("myForm");
-            const csrfInput = document.createElement("input");
-            csrfInput.setAttribute("type", "hidden");
-            csrfInput.setAttribute("name", "csrfmiddlewaretoken");
-            csrfInput.setAttribute("value", csrfToken);
-            form.appendChild(csrfInput);
-        });
-    </script>
+            document.addEventListener("DOMContentLoaded", function () {
+                const csrfToken = getCSRFToken();
+                const form = document.getElementById("myForm");
+                const csrfInput = document.createElement("input");
+                csrfInput.setAttribute("type", "hidden");
+                csrfInput.setAttribute("name", "csrfmiddlewaretoken");
+                csrfInput.setAttribute("value", csrfToken);
+                form.appendChild(csrfInput);
+
+                // Add a submit event listener to the form
+                form.addEventListener("submit", function (event) {
+                    event.preventDefault(); // Prevent the default form submission
+
+                    // Create a FormData object
+                    const formData = new FormData(form);
+
+                    // Send a fetch request to submit the form data
+                    fetch(form.action, {
+                        method: form.method,
+                        body: formData,
+                        headers: {
+                            'X-CSRFToken': csrfToken  // Include CSRF token in the headers
+                        }
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.message === "Email sent successfully!") {
+                                // Redirect to home page or any other page
+                                window.location.href = "https://ecomaitech.com/home/";  // Update with your desired URL
+                            } else {
+                                // Display an error message
+                                document.getElementById("error-msg").innerText = data.error;
+                            }
+                        })
+                        .catch(error => {
+                            // Handle errors (e.g., network issues)
+                            console.error("Error:", error);
+                            document.getElementById("error-msg").innerText = "An error occurred while sending the message.";
+                        });
+                });
+            });
+        </script>
     <!-- JAVASCRIPTS -->
     <script>
         function toggleAccordion(button) {
