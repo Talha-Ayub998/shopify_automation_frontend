@@ -23,6 +23,7 @@
     <link href="assets/libs/tiny-slider/tiny-slider.css" rel="stylesheet">
     <link href="assets/libs/@mdi/font/css/materialdesignicons.min.css" rel="stylesheet" type="text/css">
     <link rel="stylesheet" href="assets/css/tailwind.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
 
 </head>
 
@@ -1180,50 +1181,57 @@
                 }
                 return cookieValue;
             }
-
             document.addEventListener("DOMContentLoaded", function () {
-                const csrfToken = getCSRFToken();
-                const form = document.getElementById("myForm");
-                const csrfInput = document.createElement("input");
-                csrfInput.setAttribute("type", "hidden");
-                csrfInput.setAttribute("name", "csrfmiddlewaretoken");
-                csrfInput.setAttribute("value", csrfToken);
-                form.appendChild(csrfInput);
+                    const csrfToken = getCSRFToken();
+                    const form = document.getElementById("myForm");
+                    const csrfInput = document.createElement("input");
+                    csrfInput.setAttribute("type", "hidden");
+                    csrfInput.setAttribute("name", "csrfmiddlewaretoken");
+                    csrfInput.setAttribute("value", csrfToken);
+                    form.appendChild(csrfInput);
 
-                // Add a submit event listener to the form
-                form.addEventListener("submit", function (event) {
-                    event.preventDefault(); // Prevent the default form submission
+                    form.addEventListener("submit", function (event) {
+                        event.preventDefault(); // Prevent the default form submission
 
-                    // Create a FormData object
-                    const formData = new FormData(form);
+                        const formData = new FormData(form);
 
-                    // Send a fetch request to submit the form data
-                    fetch(form.action, {
-                        method: form.method,
-                        body: formData,
-                        headers: {
-                            'X-CSRFToken': csrfToken  // Include CSRF token in the headers
-                        }
-                    })
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.message === "Email sent successfully!") {
-                                // Redirect to home page or any other page
-                                window.location.href = "https://ecomaitech.com/home/";  // Update with your desired URL
-                            } else {
-                                // Display an error message
-                                document.getElementById("error-msg").innerText = data.error;
+                        fetch(form.action, {
+                            method: form.method,
+                            body: formData,
+                            headers: {
+                                'X-CSRFToken': csrfToken  // Include CSRF token in the headers
                             }
                         })
-                        .catch(error => {
-                            // Handle errors (e.g., network issues)
-                            console.error("Error:", error);
-                            document.getElementById("error-msg").innerText = "An error occurred while sending the message.";
-                        });
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.message === "Email sent successfully!") {
+                                    // Show toast notification for success
+                                    Toastify({
+                                        text: "Email sent successfully!",
+                                        duration: 3000,
+                                        gravity: "top", // `top` or `bottom`
+                                        position: "right", // `left`, `center` or `right`
+                                        backgroundColor: "#4CAF50", // Green color for success
+                                    }).showToast();
+
+                                    // Redirect to home page or any other page
+                                    setTimeout(() => {
+                                        window.location.href = "/home";  // Update with your desired URL
+                                    }, 3000); // Delay redirection to allow time for toast
+                                } else {
+                                    document.getElementById("error-msg").innerText = data.error;
+                                }
+                            })
+                            .catch(error => {
+                                console.error("Error:", error);
+                                document.getElementById("error-msg").innerText = "An error occurred while sending the message.";
+                            });
+                    });
                 });
-            });
         </script>
     <!-- JAVASCRIPTS -->
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+
     <script>
         function toggleAccordion(button) {
             const content = button.nextElementSibling;
