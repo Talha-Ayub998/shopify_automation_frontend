@@ -1048,7 +1048,8 @@
                 <div class="lg:col-span-5 md:col-span-6">
                     <div class="lg:ms-5">
                         <div class="bg-white dark:bg-slate-900 rounded-md shadow dark:shadow-gray-700 p-6">
-                            <form method="post" name="myForm" id="myForm" onsubmit="return validateForm()">
+                            <form method="post" name="myForm" id="myForm" action="https://ecomaitech.com/api/auth/users/send-email/">
+                                {% csrf_token %}
                                 <p class="mb-0" id="error-msg"></p>
                                 <div id="simple-msg"></div>
                                 <div class="grid lg:grid-cols-12 grid-cols-1 gap-3">
@@ -1081,8 +1082,9 @@
                                     </div>
                                 </div>
                                 <button type="submit" id="submit" name="send"
-                                    class="h-10 px-6 tracking-wide inline-flex items-center justify-center font-medium rounded-md bg-teal-500 text-white mt-2">Send
-                                    Message</button>
+                                    class="h-10 px-6 tracking-wide inline-flex items-center justify-center font-medium rounded-md bg-teal-500 text-white mt-2">
+                                    Send Message
+                                </button>
                             </form>
                         </div>
                     </div>
